@@ -115,6 +115,41 @@ uv run code_gen_agent.py "./inputs/[Simple] Bill processing_tampered.xlsx"
 - **fix_code gets the mapping** — when a generated script fails, the fixer sees the actual sheet/column names, not just semantic names
 - **Structured logging** — structlog writes to `logs/code_gen_agent.log` for observability
 
+### Alerting
+
+Metrics to monitor and when to fire alerts:
+
+```
+                    ┌─────────────────────────────────────┐
+                    │         Agent Health Dashboard       │
+                    └─────────────────────────────────────┘
+
+  Success Rate (rolling 1h)          Retry Rate                  Latency (p95)
+  ┌──────────────────────┐     ┌──────────────────────┐    ┌──────────────────────┐
+  │ ████████████████ 95% │     │ ██░░░░░░░░░░░░░  8% │    │ ████████░░░░░░ 4min  │
+  │                      │     │                      │    │                      │
+  │ WARN < 80%           │     │ WARN > 30%           │    │ WARN > 8min          │
+  │ CRIT < 60%           │     │ CRIT > 50%           │    │ CRIT > 12min         │
+  └──────────────────────┘     └──────────────────────┘    └──────────────────────┘
+
+  Human Asks / Job               Terminate Rate              Token Spend (daily)
+  ┌──────────────────────┐     ┌──────────────────────┐    ┌──────────────────────┐
+  │ █░░░░░░░░░░░░░░ 1.2  │     │ ██░░░░░░░░░░░░░ 10% │    │ ██████░░░░░░░░ $12   │
+  │                      │     │                      │    │                      │
+  │ WARN > 3             │     │ WARN > 25%           │    │ WARN > $50           │
+  │ CRIT > 5             │     │ CRIT > 40%           │    │ CRIT > $100          │
+  └──────────────────────┘     └──────────────────────┘    └──────────────────────┘
+```
+
+| Metric | Source | WARN | CRIT | Why |
+|--------|--------|------|------|-----|
+| Success rate | `finish` vs `terminate` count | < 80% | < 60% | Agent failing too often, spec or prompts may need tuning |
+| Retry rate | `fix_code` calls / total jobs | > 30% | > 50% | Generated code quality degrading, check LLM model changes |
+| Latency p95 | `started_at` to `finished_at` | > 8min | > 12min | LLM slowdown, queue backlog, or script stuck in loop |
+| Human asks / job | `ask_human` calls per job | > 3 | > 5 | Confidence too low, mapping logic needs improvement |
+| Terminate rate | `terminate` / total jobs | > 25% | > 40% | Bad input files increasing, or agent too conservative |
+| Token spend | Sum of `input_tokens + output_tokens` | > $50/day | > $100/day | Runaway retries or prompt bloat |
+
 ### Deployment (Scaled)
 
 See `deployment_architecture.excalidraw` for the full diagram. Key components:

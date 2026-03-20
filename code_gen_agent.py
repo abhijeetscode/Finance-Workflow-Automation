@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from pathlib import Path
@@ -203,7 +204,7 @@ class CodeGenAgent:
                 break
 
         return {
-            "messages": messages,
+            "messages": messages[-1],
             "output_files": output_files,
         }
 
@@ -285,8 +286,9 @@ if __name__ == "__main__":
     input_file = (
         sys.argv[1]
         if len(sys.argv) > 1
-        else "./inputs/[Simple] Bill processing with Error.xlsx"
+        else "./inputs/[Simple] Bill processing_tampered_2.xlsx"
     )
     agent = CodeGenAgent()
     op = agent.run(input_file_path=input_file)
-    print(op)
+    print("------ Final Agent Output ------")
+    print(json.dumps(op["messages"], indent=2))

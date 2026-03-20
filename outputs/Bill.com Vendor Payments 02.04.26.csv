@@ -1,0 +1,128 @@
+Vendor Name,Invoice Number,Invoice Date,Due Date,Amount,Category,Description,Status,Approval Date,Payment Method,Bill Payment ID,GL Account
+DataStream Analytics Inc,INV-62809,2/4/26,2/4/26,2276.88,Office Supplies,Payment for office supplies services,Pending,2/4/26,Wire Transfer,1,60000
+FreshFood Catering,INV-71016,2/4/26,2/4/26,3745.2,Consulting,Payment for consulting services,Pending,2/4/26,Wire Transfer,2,60000
+Urban Furniture Depot,INV-34733,2/4/26,2/4/26,3008.24,Marketing,Payment for marketing services,Processing,2/4/26,ACH,3,60000
+HealthCare Supplies Plus,INV-67916,2/4/26,2/4/26,1792.73,Services,Payment for services services,Processing,2/4/26,Check,4,60000
+DataStream Analytics Inc,INV-54900,2/4/26,2/4/26,1145.85,Technology,Payment for technology services,Approved,2/4/26,Check,5,60000
+DataStream Analytics Inc,INV-61965,2/4/26,2/4/26,3901.3,Technology,Payment for technology services,Processing,2/4/26,ACH,6,60000
+FastShip Logistics,INV-47913,2/4/26,2/4/26,4138.59,Consulting,Payment for consulting services,Pending,2/4/26,Wire Transfer,7,60000
+TechGear Solutions Inc,INV-45754,2/4/26,2/4/26,3696.71,Marketing,Payment for marketing services,Processing,2/4/26,Wire Transfer,8,60000
+FastShip Logistics,INV-94402,2/4/26,2/4/26,2264.58,Facilities,Payment for facilities services,Processing,2/4/26,Check,9,60000
+Acme Office Supplies Inc,INV-35283,2/4/26,2/4/26,2959.46,Services,Payment for services services,Approved,2/4/26,Check,10,60000
+FastShip Logistics,INV-64301,2/4/26,2/4/26,391.65,Office Supplies,Payment for office supplies services,Processing,2/4/26,Wire Transfer,11,60000
+CloudHost Technologies,INV-28652,2/4/26,2/4/26,104.59,Services,Payment for services services,Approved,2/4/26,Check,12,60000
+Urban Furniture Depot,INV-55689,2/4/26,2/4/26,1234.92,Consulting,Payment for consulting services,Processing,2/4/26,Check,13,60000
+PowerTools Wholesale,INV-41524,2/4/26,2/4/26,3873.69,Technology,Payment for technology services,Pending,2/4/26,Check,14,60000
+GreenPrint Marketing,INV-85532,2/4/26,2/4/26,2642.49,Facilities,Payment for facilities services,Approved,2/4/26,Wire Transfer,15,60000
+Acme Office Supplies Inc,INV-50836,2/4/26,2/4/26,811,Office Supplies,Payment for office supplies services,Pending,2/4/26,Check,16,60000
+DataStream Analytics Inc,INV-27480,2/4/26,2/4/26,3920.91,Marketing,Payment for marketing services,Pending,2/4/26,Wire Transfer,17,60000
+Urban Furniture Depot,INV-85670,2/4/26,2/4/26,3156.28,Services,Payment for services services,Pending,2/4/26,Check,18,60000
+TechGear Solutions Inc,INV-66445,2/4/26,2/4/26,2604.49,Facilities,Payment for facilities services,Processing,2/4/26,ACH,19,60000
+HealthCare Supplies Plus,INV-69249,2/4/26,2/4/26,280.2,Marketing,Payment for marketing services,Processing,2/4/26,ACH,20,60000
+PowerTools Wholesale,INV-61285,2/4/26,2/4/26,4443.72,Marketing,Payment for marketing services,Processing,2/4/26,ACH,21,60000
+FreshFood Catering,INV-26757,2/4/26,2/4/26,3086.66,Technology,Payment for technology services,Approved,2/4/26,Check,22,60000
+Premium Coffee Company,INV-70666,2/4/26,2/4/26,3946.46,Technology,Payment for technology services,Processing,2/4/26,ACH,23,60000
+FreshFood Catering,INV-65763,2/4/26,2/4/26,3891,Marketing,Payment for marketing services,Processing,2/4/26,ACH,24,60000
+PowerTools Wholesale,INV-30113,2/4/26,2/4/26,3336.27,Facilities,Payment for facilities services,Processing,2/4/26,Wire Transfer,25,60000
+TechGear Solutions Inc,INV-58253,2/4/26,2/4/26,3780.5,Marketing,Payment for marketing services,Approved,2/4/26,Wire Transfer,26,60000
+FreshFood Catering,INV-97904,2/4/26,2/4/26,4814.12,Services,Payment for services services,Processing,2/4/26,Check,27,60000
+DataStream Analytics Inc,INV-21760,2/4/26,2/4/26,200.5,Facilities,Payment for facilities services,Processing,2/4/26,Wire Transfer,28,60000
+FreshFood Catering,INV-20298,2/4/26,2/4/26,2361.76,Facilities,Payment for facilities services,Approved,2/4/26,Check,29,60000
+SecureIT Systems,INV-65956,2/4/26,2/4/26,1654.29,Facilities,Payment for facilities services,Pending,2/4/26,ACH,30,60000
+Acme Office Supplies Inc,INV-89782,2/4/26,2/4/26,3000.45,Services,Payment for services services,Processing,2/4/26,Wire Transfer,31,60000
+SecureIT Systems,INV-51980,2/4/26,2/4/26,1208.58,Consulting,Payment for consulting services,Approved,2/4/26,Check,32,60000
+Urban Furniture Depot,INV-83410,2/4/26,2/4/26,4977.52,Office Supplies,Payment for office supplies services,Approved,2/4/26,Check,33,60000
+HealthCare Supplies Plus,INV-14902,2/4/26,2/4/26,3508.07,Services,Payment for services services,Pending,2/4/26,Check,34,60000
+Urban Furniture Depot,INV-49668,2/4/26,2/4/26,2822.31,Services,Payment for services services,Processing,2/4/26,ACH,35,60000
+DataStream Analytics Inc,INV-54663,2/4/26,2/4/26,4041.48,Marketing,Payment for marketing services,Pending,2/4/26,Wire Transfer,36,60000
+GreenPrint Marketing,INV-23217,2/4/26,2/4/26,1894.55,Marketing,Payment for marketing services,Approved,2/4/26,Check,37,60000
+Acme Office Supplies Inc,INV-10071,2/4/26,2/4/26,2722.42,Office Supplies,Payment for office supplies services,Pending,2/4/26,Check,38,60000
+Urban Furniture Depot,INV-44655,2/4/26,2/4/26,261.91,Office Supplies,Payment for office supplies services,Pending,2/4/26,Check,39,60000
+CloudHost Technologies,INV-26990,2/4/26,2/4/26,2629.38,Office Supplies,Payment for office supplies services,Pending,2/4/26,Wire Transfer,40,60000
+FastShip Logistics,INV-94717,2/4/26,2/4/26,2132.85,Marketing,Payment for marketing services,Processing,2/4/26,Wire Transfer,41,60000
+CloudHost Technologies,INV-95485,2/4/26,2/4/26,1244.47,Office Supplies,Payment for office supplies services,Processing,2/4/26,ACH,42,60000
+GreenPrint Marketing,INV-64177,2/4/26,2/4/26,1709.91,Facilities,Payment for facilities services,Pending,2/4/26,Check,43,60000
+HealthCare Supplies Plus,INV-95016,2/4/26,2/4/26,1985.5,Services,Payment for services services,Processing,2/4/26,Check,44,60000
+GreenPrint Marketing,INV-45020,2/4/26,2/4/26,3236.65,Office Supplies,Payment for office supplies services,Pending,2/4/26,Wire Transfer,45,60000
+Urban Furniture Depot,INV-69321,2/4/26,2/4/26,4813.34,Services,Payment for services services,Pending,2/4/26,ACH,46,60000
+FreshFood Catering,INV-92520,2/4/26,2/4/26,2303.45,Facilities,Payment for facilities services,Approved,2/4/26,Wire Transfer,47,60000
+DataStream Analytics Inc,INV-40607,2/4/26,2/4/26,2413.89,Consulting,Payment for consulting services,Pending,2/4/26,Wire Transfer,48,60000
+TechGear Solutions Inc,INV-62781,2/4/26,2/4/26,1658.28,Facilities,Payment for facilities services,Processing,2/4/26,ACH,49,60000
+GreenPrint Marketing,INV-40524,2/4/26,2/4/26,2949.56,Office Supplies,Payment for office supplies services,Approved,2/4/26,Check,50,60000
+CloudHost Technologies,INV-61545,2/4/26,2/4/26,3321.24,Technology,Payment for technology services,Approved,2/4/26,Check,51,60000
+Urban Furniture Depot,INV-81618,2/4/26,2/4/26,1321.09,Marketing,Payment for marketing services,Processing,2/4/26,Wire Transfer,52,60000
+GreenPrint Marketing,INV-55623,2/4/26,2/4/26,1163.72,Consulting,Payment for consulting services,Pending,2/4/26,Check,53,60000
+Urban Furniture Depot,INV-90082,2/4/26,2/4/26,3041.81,Consulting,Payment for consulting services,Processing,2/4/26,Wire Transfer,54,60000
+PowerTools Wholesale,INV-62762,2/4/26,2/4/26,2668.35,Services,Payment for services services,Processing,2/4/26,Wire Transfer,55,60000
+Premium Coffee Company,INV-61906,2/4/26,2/4/26,2192.31,Services,Payment for services services,Approved,2/4/26,ACH,56,60000
+CloudHost Technologies,INV-76842,2/4/26,2/4/26,125,Office Supplies,Payment for office supplies services,Pending,2/4/26,Wire Transfer,57,60000
+Premium Coffee Company,INV-52715,2/4/26,2/4/26,862.51,Services,Payment for services services,Processing,2/4/26,Wire Transfer,58,60000
+HealthCare Supplies Plus,INV-16036,2/4/26,2/4/26,3654.85,Technology,Payment for technology services,Processing,2/4/26,Check,59,60000
+Urban Furniture Depot,INV-62741,2/4/26,2/4/26,4366.33,Technology,Payment for technology services,Processing,2/4/26,ACH,60,60000
+SecureIT Systems,INV-56887,2/4/26,2/4/26,3503.4,Office Supplies,Payment for office supplies services,Processing,2/4/26,Wire Transfer,61,60000
+PowerTools Wholesale,INV-74181,2/4/26,2/4/26,3479.01,Office Supplies,Payment for office supplies services,Processing,2/4/26,Wire Transfer,62,60000
+Acme Office Supplies Inc,INV-36374,2/4/26,2/4/26,3379.66,Office Supplies,Payment for office supplies services,Processing,2/4/26,ACH,63,60000
+DataStream Analytics Inc,INV-50237,2/4/26,2/4/26,3056.56,Facilities,Payment for facilities services,Processing,2/4/26,Wire Transfer,64,60000
+LegalEagle Consulting,INV-77691,2/4/26,2/4/26,1778.54,Services,Payment for services services,Pending,2/4/26,Wire Transfer,65,60000
+TechGear Solutions Inc,INV-43302,2/4/26,2/4/26,3656.45,Office Supplies,Payment for office supplies services,Pending,2/4/26,ACH,66,60000
+FreshFood Catering,INV-79453,2/4/26,2/4/26,3968.27,Facilities,Payment for facilities services,Approved,2/4/26,Check,67,60000
+FastShip Logistics,INV-33832,2/4/26,2/4/26,1123.13,Technology,Payment for technology services,Approved,2/4/26,ACH,68,60000
+DataStream Analytics Inc,INV-63182,2/4/26,2/4/26,3114.59,Office Supplies,Payment for office supplies services,Pending,2/4/26,Check,69,60000
+CloudHost Technologies,INV-79799,2/4/26,2/4/26,1824,Marketing,Payment for marketing services,Approved,2/4/26,Wire Transfer,70,60000
+PowerTools Wholesale,INV-29930,2/4/26,2/4/26,2941.38,Facilities,Payment for facilities services,Approved,2/4/26,ACH,71,60000
+GreenPrint Marketing,INV-49935,2/4/26,2/4/26,1561.56,Services,Payment for services services,Pending,2/4/26,ACH,72,60000
+GreenPrint Marketing,INV-15700,2/4/26,2/4/26,1926.98,Consulting,Payment for consulting services,Approved,2/4/26,Wire Transfer,73,60000
+DataStream Analytics Inc,INV-30886,2/4/26,2/4/26,4641.6,Consulting,Payment for consulting services,Processing,2/4/26,ACH,74,60000
+HealthCare Supplies Plus,INV-17898,2/4/26,2/4/26,2988.95,Services,Payment for services services,Pending,2/4/26,Wire Transfer,75,60000
+Premium Coffee Company,INV-29030,2/4/26,2/4/26,4250.97,Marketing,Payment for marketing services,Pending,2/4/26,Wire Transfer,76,60000
+FreshFood Catering,INV-30908,2/4/26,2/4/26,822.1,Facilities,Payment for facilities services,Pending,2/4/26,Wire Transfer,77,60000
+PowerTools Wholesale,INV-83704,2/4/26,2/4/26,4858.87,Technology,Payment for technology services,Processing,2/4/26,Wire Transfer,78,60000
+FreshFood Catering,INV-51379,2/4/26,2/4/26,1553.88,Office Supplies,Payment for office supplies services,Processing,2/4/26,Wire Transfer,79,60000
+DataStream Analytics Inc,INV-66388,2/4/26,2/4/26,3037.82,Marketing,Payment for marketing services,Processing,2/4/26,ACH,80,60000
+GreenPrint Marketing,INV-27783,2/4/26,2/4/26,2887.72,Marketing,Payment for marketing services,Processing,2/4/26,ACH,81,60000
+Premium Coffee Company,INV-76499,2/4/26,2/4/26,2510.95,Technology,Payment for technology services,Processing,2/4/26,Wire Transfer,82,60000
+HealthCare Supplies Plus,INV-57229,2/4/26,2/4/26,3112.81,Marketing,Payment for marketing services,Pending,2/4/26,Check,83,60000
+PowerTools Wholesale,INV-26477,2/4/26,2/4/26,1634.16,Consulting,Payment for consulting services,Pending,2/4/26,Wire Transfer,84,60000
+TechGear Solutions Inc,INV-23775,2/4/26,2/4/26,4460.23,Services,Payment for services services,Approved,2/4/26,Wire Transfer,85,60000
+PowerTools Wholesale,INV-41641,2/4/26,2/4/26,746.66,Marketing,Payment for marketing services,Processing,2/4/26,Wire Transfer,86,60000
+CloudHost Technologies,INV-22704,2/4/26,2/4/26,472.43,Technology,Payment for technology services,Processing,2/4/26,Wire Transfer,87,60000
+DataStream Analytics Inc,INV-47969,2/4/26,2/4/26,2308.27,Marketing,Payment for marketing services,Pending,2/4/26,ACH,88,60000
+LegalEagle Consulting,INV-74268,2/4/26,2/4/26,874.44,Consulting,Payment for consulting services,Pending,2/4/26,Wire Transfer,89,60000
+Premium Coffee Company,INV-71861,2/4/26,2/4/26,4194.26,Consulting,Payment for consulting services,Approved,2/4/26,Wire Transfer,90,60000
+HealthCare Supplies Plus,INV-78818,2/4/26,2/4/26,3508.98,Consulting,Payment for consulting services,Approved,2/4/26,Wire Transfer,91,60000
+FastShip Logistics,INV-45348,2/4/26,2/4/26,676.61,Facilities,Payment for facilities services,Pending,2/4/26,ACH,92,60000
+SecureIT Systems,INV-76437,2/4/26,2/4/26,4590.36,Consulting,Payment for consulting services,Pending,2/4/26,Wire Transfer,93,60000
+Premium Coffee Company,INV-42955,2/4/26,2/4/26,4246.72,Marketing,Payment for marketing services,Approved,2/4/26,ACH,94,60000
+FastShip Logistics,INV-22990,2/4/26,2/4/26,3956.53,Facilities,Payment for facilities services,Pending,2/4/26,ACH,95,60000
+SecureIT Systems,INV-68475,2/4/26,2/4/26,4294.08,Consulting,Payment for consulting services,Processing,2/4/26,Check,96,60000
+CloudHost Technologies,INV-81423,2/4/26,2/4/26,4078.9,Consulting,Payment for consulting services,Approved,2/4/26,Wire Transfer,97,60000
+LegalEagle Consulting,INV-59830,2/4/26,2/4/26,3891.91,Services,Payment for services services,Approved,2/4/26,ACH,98,60000
+CloudHost Technologies,INV-52618,2/4/26,2/4/26,3450.4,Technology,Payment for technology services,Pending,2/4/26,Check,99,60000
+SecureIT Systems,INV-99056,2/4/26,2/4/26,2697.17,Consulting,Payment for consulting services,Pending,2/4/26,Check,100,60000
+CloudHost Technologies,INV-98143,2/4/26,2/4/26,4915.69,Facilities,Payment for facilities services,Pending,2/4/26,Check,101,60000
+Acme Office Supplies Inc,INV-46681,2/4/26,2/4/26,2322.06,Services,Payment for services services,Processing,2/4/26,Wire Transfer,102,60000
+Acme Office Supplies Inc,INV-88419,2/4/26,2/4/26,3127.97,Facilities,Payment for facilities services,Processing,2/4/26,ACH,103,60000
+FreshFood Catering,INV-56820,2/4/26,2/4/26,2934.95,Services,Payment for services services,Processing,2/4/26,Check,104,60000
+Premium Coffee Company,INV-91789,2/4/26,2/4/26,2689.33,Facilities,Payment for facilities services,Pending,2/4/26,Check,105,60000
+SecureIT Systems,INV-64820,2/4/26,2/4/26,3217.49,Office Supplies,Payment for office supplies services,Pending,2/4/26,ACH,106,60000
+Premium Coffee Company,INV-37898,2/4/26,2/4/26,2895.43,Technology,Payment for technology services,Processing,2/4/26,Check,107,60000
+PowerTools Wholesale,INV-79021,2/4/26,2/4/26,4452.4,Marketing,Payment for marketing services,Pending,2/4/26,Check,108,60000
+HealthCare Supplies Plus,INV-67071,2/4/26,2/4/26,722.53,Office Supplies,Payment for office supplies services,Processing,2/4/26,Wire Transfer,109,60000
+FastShip Logistics,INV-94977,2/4/26,2/4/26,314.18,Technology,Payment for technology services,Pending,2/4/26,Wire Transfer,110,60000
+FreshFood Catering,INV-59369,2/4/26,2/4/26,1127.23,Marketing,Payment for marketing services,Approved,2/4/26,Wire Transfer,111,60000
+FreshFood Catering,INV-11042,2/4/26,2/4/26,4894.21,Consulting,Payment for consulting services,Pending,2/4/26,Check,112,60000
+HealthCare Supplies Plus,INV-34598,2/4/26,2/4/26,4267.12,Marketing,Payment for marketing services,Processing,2/4/26,Wire Transfer,113,60000
+GreenPrint Marketing,INV-36310,2/4/26,2/4/26,187.48,Consulting,Payment for consulting services,Approved,2/4/26,ACH,114,60000
+Acme Office Supplies Inc,INV-55265,2/4/26,2/4/26,1106.88,Facilities,Payment for facilities services,Approved,2/4/26,Wire Transfer,115,60000
+Premium Coffee Company,INV-63737,2/4/26,2/4/26,1997.8,Office Supplies,Payment for office supplies services,Approved,2/4/26,ACH,116,60000
+DataStream Analytics Inc,INV-82658,2/4/26,2/4/26,919.62,Technology,Payment for technology services,Processing,2/4/26,ACH,117,60000
+CloudHost Technologies,INV-25490,2/4/26,2/4/26,931.06,Technology,Payment for technology services,Processing,2/4/26,ACH,118,60000
+SecureIT Systems,INV-79944,2/4/26,2/4/26,2859.62,Marketing,Payment for marketing services,Pending,2/4/26,Wire Transfer,119,60000
+Acme Office Supplies Inc,INV-86570,2/4/26,2/4/26,76.42,Services,Payment for services services,Approved,2/4/26,Check,120,60000
+HealthCare Supplies Plus,INV-86217,2/4/26,2/4/26,3329.05,Office Supplies,Payment for office supplies services,Approved,2/4/26,ACH,121,60000
+Acme Office Supplies Inc,INV-99108,2/4/26,2/4/26,3520.91,Office Supplies,Payment for office supplies services,Approved,2/4/26,Wire Transfer,122,60000
+PowerTools Wholesale,INV-39538,2/4/26,2/4/26,2813.33,Office Supplies,Payment for office supplies services,Processing,2/4/26,ACH,123,60000
+PowerTools Wholesale,INV-35905,2/4/26,2/4/26,3339.22,Technology,Payment for technology services,Processing,2/4/26,ACH,124,60000
+GreenPrint Marketing,INV-94684,2/4/26,2/4/26,828.27,Office Supplies,Payment for office supplies services,Approved,2/4/26,ACH,125,60000
+HealthCare Supplies Plus,INV-26340,2/4/26,2/4/26,86.95,Facilities,Payment for facilities services,Pending,2/4/26,Wire Transfer,126,60000
+FastShip Logistics,INV-91014,2/4/26,2/4/26,1777.48,Marketing,Payment for marketing services,Approved,2/4/26,ACH,127,60000

@@ -8,3 +8,13 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Environment
+.env
+
+# Lock files
+uv.lock
+
+# Data files
+*.xlsx
+*.csv

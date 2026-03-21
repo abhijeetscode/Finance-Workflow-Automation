@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -64,10 +65,10 @@ You MUST end every run by calling either finish (success) or terminate (failure)
 
 class CodeGenAgent:
 	def __init__(self):
-		self.client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+		self.client = anthropic.AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 		self.model = os.getenv("LM_MODEL", "claude-haiku-4-5")
 
-	def run(self, input_file_path: str, max_steps: int = 20) -> dict:
+	async def run(self, input_file_path: str, max_steps: int = 20) -> dict:
 		log = logger.bind(file=input_file_path)
 		log.info("starting_agent")
 		new_file_sample = get_file_sample(input_file_path)
@@ -94,7 +95,7 @@ class CodeGenAgent:
 		for step in range(max_steps):
 			log.info("step", current=step + 1, max=max_steps)
 
-			response = self.client.messages.create(
+			response = await self.client.messages.create(
 				model=self.model,
 				max_tokens=4096,
 				system=SYSTEM_PROMPT,
@@ -281,6 +282,6 @@ if __name__ == "__main__":
 		sys.argv[1] if len(sys.argv) > 1 else "./inputs/[Simple] Bill processing_tampered_2.xlsx"
 	)
 	agent = CodeGenAgent()
-	op = agent.run(input_file_path=input_file)
+	op = asyncio.run(agent.run(input_file_path=input_file))
 	print("------ Final Agent Output ------")
 	print(json.dumps(op["messages"], indent=2))

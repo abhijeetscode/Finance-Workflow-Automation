@@ -36,4 +36,11 @@ select = [
 ]
 ignore = [
     "E501",  # line-too-long (handled by formatter)
+    "W191",  # indentation contains tabs (handled by formatter)
+    "E101",  # indentation contains mixed spaces and tabs
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.7",
 ]

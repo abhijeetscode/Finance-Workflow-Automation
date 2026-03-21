@@ -1,0 +1,66 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Schema Adapter Agent (copy file)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "schema_adapter_agent",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Schema Adapter Agent (custom file)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "schema_adapter_agent",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env",
+      "args": ["${input:inputFile}"]
+    },
+    {
+      "name": "Code Gen Agent (copy file)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "code_gen_agent",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Code Gen Agent (custom file)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "code_gen_agent",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env",
+      "args": ["${input:inputFile}"]
+    },
+    {
+      "name": "Process (execution agent)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/code/process.py",
+      "args": ["${input:inputFile}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "inputFile",
+      "type": "promptString",
+      "description": "Path to Excel input file",
+      "default": "./inputs/[Simple] Bill processing_tampered.xlsx"
+    }
+  ]
+}

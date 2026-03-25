@@ -36,4 +36,6 @@ select = [
 ]
 ignore = [
     "E501",  # line-too-long (handled by formatter)
+    "W191",  # tab indentation (handled by formatter)
+    "E101",  # mixed spaces and tabs (handled by formatter)
 ]

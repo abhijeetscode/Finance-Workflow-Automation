@@ -1,26 +1,24 @@
 import os
-import sys
 import subprocess
-from typing import Any
+import sys
 from pathlib import Path
+from typing import Any
 
 import dspy
 import pandas as pd
 import structlog
+from dotenv import load_dotenv
 from pydantic import BaseModel
 from tabulate import tabulate
-from dotenv import load_dotenv
 
 from code_gen_models import (
 	BusinessLogicSpec,
-	InputColumnSignature,
+	ColumnMatch,
 	InputMapping,
 	InputSheetSignature,
-	OutputColumnSpec,
 	OutputSheetSpec,
 	SemanticValidation,
 	SheetMatch,
-	ColumnMatch,
 	TransformationRule,
 )
 

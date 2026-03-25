@@ -1,14 +1,16 @@
-import os
 import json
 import logging
+import os
+from pathlib import Path
+
 import dspy
 import pandas as pd
+from dotenv import load_dotenv
 from openai import OpenAI
 from pydantic import BaseModel
-from pathlib import Path
 from tabulate import tabulate
-from dotenv import load_dotenv
-from tool_funcs import TOOLS, OPENAI_TOOLS, ObservationResult
+
+from tool_funcs import OPENAI_TOOLS, TOOLS
 
 load_dotenv()
 

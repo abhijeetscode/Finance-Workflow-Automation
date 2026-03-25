@@ -13,7 +13,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 logging.basicConfig(
 	level=logging.INFO,
 	format="%(asctime)s %(levelname)s %(message)s",
@@ -257,7 +256,7 @@ def main() -> int:
 			if col in df_working.columns:
 				df_working[col] = df_working[col].apply(format_date)
 
-		logger.info(f"      Added Bill Payment IDs and GL Accounts")
+		logger.info("      Added Bill Payment IDs and GL Accounts")
 	except Exception as e:
 		logger.error(f"Failed to add Bill.com fields: {e}")
 		return 1
@@ -317,7 +316,7 @@ def main() -> int:
 	logger.info(f"Previously Paid:      {len(df_previously_uploaded)}")
 	logger.info(f"Output Records:       {final_count}")
 	logger.info(f"Total Amount:         ${final_amount:,.2f}")
-	logger.info(f"\nOutput Files:")
+	logger.info("\nOutput Files:")
 	logger.info(f"  - {audit_filename.name}")
 	logger.info(f"  - {csv_filename.name}")
 	logger.info(f"{'=' * 60}\n")

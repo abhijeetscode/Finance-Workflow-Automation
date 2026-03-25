@@ -208,7 +208,15 @@ def get_source_code() -> str:
 	return Path("./schema_adapter/reference_process.py").read_text()
 
 
-def get_lm() -> dspy.LM:
+def get_lm(strong: bool = False) -> dspy.LM:
+	openai_key = os.getenv("OPENAI_API_KEY")
+	model_name = "openai/gpt-4o-mini" if not strong else "openai/gpt-5.4-mini"
+	if openai_key:
+		return dspy.LM(
+			model_name,
+			temperature=0.0,
+			api_key=openai_key,
+		)
 	model = os.getenv("LM_MODEL", "claude-haiku-4-5")
 	return dspy.LM(
 		f"anthropic/{model}",
@@ -232,6 +240,7 @@ def tool_learn_business_logic(
 	"""
 	cache_path = Path("./config/business_logic_spec.json")
 	if cache_path.exists():
+		print("[learn_business_logic] Loading cached spec...")
 		logger.info("Loading cached BusinessLogicSpec from %s", cache_path)
 		spec = BusinessLogicSpec.model_validate_json(cache_path.read_text())
 		return ObservationResult(
@@ -314,11 +323,13 @@ def tool_identify_sheets(
 		)
 
 	lm = get_lm()
+	print(f"[identify_sheets] Calling LLM ({lm.model}) to match sheets...")
 	with dspy.context(lm=lm):
 		result = dspy.ChainOfThought(SheetIdentificationSignature)(
 			input_sheet_signatures=str([s.model_dump() for s in spec.input_sheets]),
 			new_file_sample=new_file_sample,
 		)
+	print("[identify_sheets] LLM call done.")
 
 	matches = result.sheet_matches
 	summary_lines = []
@@ -359,11 +370,11 @@ def tool_map_columns(
 	xl = pd.ExcelFile(new_file_path)
 	all_column_matches: list[ColumnMatch] = []
 
-	with dspy.context(lm=lm):
-		for sheet_match in sheet_matches:
-			if not sheet_match.actual_sheet_name or sheet_match.confidence < 0.50:
-				continue
+	sheets_to_map = [sm for sm in sheet_matches if sm.actual_sheet_name and sm.confidence >= 0.50]
+	print(f"[map_columns] {len(sheets_to_map)} sheets to map using {lm.model}")
 
+	with dspy.context(lm=lm):
+		for i, sheet_match in enumerate(sheets_to_map, 1):
 			# Find the spec for this role
 			sheet_spec = next(
 				(s for s in spec.input_sheets if s.semantic_role == sheet_match.semantic_role),
@@ -376,6 +387,10 @@ def tool_map_columns(
 			df = pd.read_excel(xl, sheet_name=sheet_match.actual_sheet_name)
 			sample = tabulate(df.head(5), headers="keys", tablefmt="pipe", showindex=False)
 
+			print(
+				f"[map_columns] ({i}/{len(sheets_to_map)}) "
+				f"LLM call for '{sheet_match.actual_sheet_name}' (role: {sheet_match.semantic_role})..."
+			)
 			logger.info(
 				"Mapping columns for '%s' (role: %s)...",
 				sheet_match.actual_sheet_name,
@@ -386,6 +401,7 @@ def tool_map_columns(
 				expected_columns=str([c.model_dump() for c in sheet_spec.columns]),
 				actual_sheet_sample=f"Sheet: {sheet_match.actual_sheet_name}\n{sample}",
 			)
+			print(f"[map_columns] ({i}/{len(sheets_to_map)}) Done '{sheet_match.actual_sheet_name}'")
 
 			# Tag each match with the sheet role
 			for cm in result.column_matches:
@@ -464,9 +480,10 @@ def tool_generate_code(
 			output="Spec or mapping not provided.",
 		)
 
-	lm = get_lm()
+	lm = get_lm(strong=True)
 	reference_code = get_source_code()
 
+	print(f"[generate_code] Calling LLM ({lm.model}) to generate script...")
 	with dspy.context(lm=lm):
 		result = dspy.ChainOfThought(CodeGenerationSignature)(
 			business_logic_spec=spec.model_dump_json(),
@@ -475,6 +492,7 @@ def tool_generate_code(
 			reference_code=reference_code,
 			user_instructions=user_instructions,
 		)
+	print("[generate_code] LLM call done.")
 
 	script = result.python_script
 
@@ -512,27 +530,40 @@ def tool_execute_code(
 	Returns:
 	    stdout + stderr from the script.
 	"""
+	print(f"[execute_code] Running: {script_path} {input_file} {output_dir}")
 	cmd = [sys.executable, script_path, input_file, output_dir]
-	# Snapshot output dir before execution
 	output_path = Path(output_dir)
 	output_path.mkdir(exist_ok=True)
-	before = set(output_path.iterdir())
+
+	# Record modification times before execution
+	before_mtimes = {f: f.stat().st_mtime for f in output_path.iterdir()}
 
 	try:
 		result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 		success = result.returncode == 0
 		output = result.stdout + result.stderr
 
-		# Detect newly created files
-		after = set(output_path.iterdir())
-		new_files = sorted(str(f) for f in after - before)
-		if new_files:
-			file_list = "\n".join(new_files)
+		if not success:
+			print(f"[execute_code] FAILED (exit code {result.returncode}):")
+			print(f"[execute_code] stderr: {result.stderr[:1000]}")
+			print(f"[execute_code] stdout: {result.stdout[:500]}")
+		else:
+			print("[execute_code] Script ran successfully.")
+
+		# Detect newly created or modified files
+		output_files = []
+		for f in sorted(output_path.iterdir()):
+			old_mtime = before_mtimes.get(f)
+			if old_mtime is None or f.stat().st_mtime > old_mtime:
+				output_files.append(str(f))
+		if output_files:
+			file_list = "\n".join(output_files)
 			output += f"\n\nOutput files:\n{file_list}"
-			logger.info("Output files created", files=new_files)
+			logger.info("Output files created/modified", files=output_files)
+			print(f"[execute_code] Output files: {output_files}")
 
 		return ObservationResult(
-			tool="execute_code", success=success, output=output, data=new_files
+			tool="execute_code", success=success, output=output, data=output_files
 		)
 	except subprocess.TimeoutExpired:
 		return ObservationResult(
@@ -557,6 +588,7 @@ def tool_validate_output(
 	if spec is None:
 		return ObservationResult(tool="validate_output", success=False, output="Spec not provided.")
 
+	print(f"[validate_output] Checking output in {output_dir}...")
 	output_path = Path(output_dir)
 	errors: list[str] = []
 
@@ -682,8 +714,10 @@ def tool_fix_code(
 		return ObservationResult(tool="fix_code", success=False, output="Spec not provided.")
 
 	script = Path(script_path).read_text()
-	lm = get_lm()
+	lm = get_lm(strong=True)
 
+	print(f"[fix_code] Calling LLM ({lm.model}) to fix script...")
+	print(f"[fix_code] Error received: {error_message[:500]}")
 	mapping_json = mapping.model_dump_json() if mapping else "{}"
 
 	with dspy.context(lm=lm):
@@ -702,6 +736,7 @@ def tool_fix_code(
 			lines = lines[:-1]
 		fixed = "\n".join(lines)
 
+	print("[fix_code] LLM call done.")
 	Path(script_path).write_text(fixed)
 	logger.info("Fixed script saved to %s", script_path)
 

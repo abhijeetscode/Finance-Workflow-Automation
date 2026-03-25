@@ -44,6 +44,17 @@
       "args": ["${input:inputFile}"]
     },
     {
+      "name": "FastAPI Debug",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["api.main:app", "--reload", "--port", "8000", "--reload-exclude", "logs/*", "--reload-exclude", "uploads/*", "--reload-exclude", "outputs/*", "--reload-exclude", "generated_scripts/*", "--reload-exclude", "data/*"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
       "name": "Process (execution agent)",
       "type": "debugpy",
       "request": "launch",

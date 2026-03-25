@@ -13,6 +13,14 @@ dependencies = [
     "structlog>=25.5.0",
     "tabulate>=0.10.0",
     "pytest>=8.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "slowapi>=0.1.9",
+    "python-multipart>=0.0.18",
+    "pyjwt>=2.9.0",
+    "bcrypt>=4.0.0",
+    "sqlalchemy>=2.0.0",
+    "pydantic-ai[anthropic,openai]>=0.1.0",
 ]
 
 [tool.ruff]

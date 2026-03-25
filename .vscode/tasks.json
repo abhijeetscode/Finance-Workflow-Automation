@@ -1,0 +1,70 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Backend: FastAPI",
+      "type": "shell",
+      "command": "lsof -ti:8000 | xargs kill -9 2>/dev/null; uv run uvicorn api.main:app --reload --host 127.0.0.1 --port 8000 --reload-exclude 'logs/*' --reload-exclude 'uploads/*' --reload-exclude 'outputs/*' --reload-exclude 'generated_scripts/*' --reload-exclude 'data/*'",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "DOTENV_PATH": "${workspaceFolder}/.env"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^ERROR",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^INFO:.*Started",
+          "endsPattern": "^INFO:.*Uvicorn running"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Frontend: Svelte",
+      "type": "shell",
+      "command": "lsof -ti:5173 | xargs kill -9 2>/dev/null; npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^error",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^\\s*VITE",
+          "endsPattern": "ready in"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Dev: Start All",
+      "dependsOn": ["Backend: FastAPI", "Frontend: Svelte"],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

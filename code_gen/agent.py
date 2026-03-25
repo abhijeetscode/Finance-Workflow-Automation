@@ -2,18 +2,28 @@ import asyncio
 import json
 import logging
 import os
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass, field
 from pathlib import Path
-
-import anthropic
 import structlog
 from dotenv import load_dotenv
+from pydantic_ai import Agent, RunContext
+from pydantic_ai.models.fallback import FallbackModel
 
 from code_gen.models import BusinessLogicSpec, InputMapping, SheetMatch
 from code_gen.tools import (
-	ANTHROPIC_TOOLS,
-	TOOLS,
 	ObservationResult,
 	get_file_sample,
+	tool_ask_human,
+	tool_execute_code,
+	tool_finish,
+	tool_fix_code,
+	tool_generate_code,
+	tool_identify_sheets,
+	tool_learn_business_logic,
+	tool_map_columns,
+	tool_terminate,
+	tool_validate_output,
 )
 
 load_dotenv()
@@ -60,219 +70,271 @@ Your workflow:
 9. Call finish when done, or terminate if it cannot be completed
 
 You MUST end every run by calling either finish (success) or terminate (failure).
+
+IMPORTANT rules for ask_human:
+- The user is a non-technical business person. Do NOT use internal jargon like "semantic role", "confidence score", "mapping", "spec", or column/sheet IDs.
+- Write questions in plain English. Explain what you found and what you need confirmed.
+- Example BAD question: "The column mapping for 'Payment Hold List.Vendor Name' has MEDIUM confidence (0.55). Confirm?"
+- Example GOOD question: "In sheet 'Sheet 2', I found a column called 'Vendor' — does this contain the list of vendors whose payments should be held?"
+- NEVER call ask_human and other tools in parallel. Always wait for the human response before proceeding.
+- NEVER call ask_human more than once per turn. You MUST only make ONE tool call when that call is ask_human.
+- If you have multiple questions, combine them into a single numbered list in ONE ask_human call.
+- After ask_human returns, read the response before deciding the next step.
 """
 
 
-class CodeGenAgent:
-	def __init__(self):
-		self.client = anthropic.AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-		self.model = os.getenv("LM_MODEL", "claude-haiku-4-5")
+@dataclass
+class AgentDeps:
+	input_file_path: str
+	new_file_sample: str
+	spec: BusinessLogicSpec | None = None
+	sheet_matches: list[SheetMatch] | None = None
+	mapping: InputMapping | None = None
+	script_path: str | None = None
+	output_files: list[str] = field(default_factory=list)
+	retries: int = 0
+	step: int = 0
+	done: bool = False
+	terminated: bool = False
+	terminate_reason: str = ""
+	_ask_human_pending: bool = False
+	ask_human_fn: Callable[[str], Awaitable[ObservationResult]] | None = None
+	on_tool_start: Callable[[int, str], Awaitable[None]] | None = None
+	on_step: Callable[[int, str, ObservationResult], Awaitable[None]] | None = None
 
-	async def run(self, input_file_path: str, max_steps: int = 20) -> dict:
+
+def _build_model():
+	"""Build model with FallbackModel if both keys are available."""
+	anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+	openai_key = os.getenv("OPENAI_API_KEY")
+	lm_model = os.getenv("LM_MODEL", "claude-haiku-4-5")
+
+	if openai_key and anthropic_key:
+		return FallbackModel(
+			"openai:gpt-4o-mini",
+			f"anthropic:{lm_model}",
+		)
+	elif openai_key:
+		return "openai:gpt-4o-mini"
+	elif anthropic_key:
+		return f"anthropic:{lm_model}"
+	else:
+		return "openai:gpt-4o-mini"
+
+
+code_gen_agent = Agent(
+	model=_build_model(),
+	system_prompt=SYSTEM_PROMPT,
+	deps_type=AgentDeps,
+)
+
+
+async def _notify_start(ctx: RunContext[AgentDeps], tool_name: str):
+	ctx.deps.step += 1
+	print(f"[agent] Tool START: {tool_name} (step {ctx.deps.step})")
+	if ctx.deps.on_tool_start:
+		await ctx.deps.on_tool_start(ctx.deps.step, tool_name)
+
+
+async def _notify_done(ctx: RunContext[AgentDeps], tool_name: str, obs: ObservationResult):
+	print(f"[agent] Tool DONE:  {tool_name} (step {ctx.deps.step}, success={obs.success})")
+	if ctx.deps.on_step:
+		await ctx.deps.on_step(ctx.deps.step, tool_name, obs)
+
+
+@code_gen_agent.tool
+async def learn_business_logic(ctx: RunContext[AgentDeps]) -> str:
+	"""Extract BusinessLogicSpec from working input, process.py, and output. Run once."""
+	await _notify_start(ctx, "learn_business_logic")
+	obs = await asyncio.to_thread(tool_learn_business_logic)
+	if obs.success:
+		ctx.deps.spec = obs.data
+	await _notify_done(ctx, "learn_business_logic", obs)
+	return obs.output
+
+
+@code_gen_agent.tool
+async def identify_sheets(ctx: RunContext[AgentDeps]) -> str:
+	"""Identify which sheets in the new file match expected semantic roles. Run after learn_business_logic."""
+	await _notify_start(ctx, "identify_sheets")
+	obs = await asyncio.to_thread(
+		tool_identify_sheets, spec=ctx.deps.spec, new_file_sample=ctx.deps.new_file_sample
+	)
+	if obs.success:
+		ctx.deps.sheet_matches = obs.data
+	await _notify_done(ctx, "identify_sheets", obs)
+	return obs.output
+
+
+@code_gen_agent.tool
+async def map_columns(ctx: RunContext[AgentDeps]) -> str:
+	"""Map columns in each identified sheet to expected semantic columns. Run after identify_sheets."""
+	await _notify_start(ctx, "map_columns")
+	obs = await asyncio.to_thread(
+		tool_map_columns,
+		spec=ctx.deps.spec,
+		sheet_matches=ctx.deps.sheet_matches,
+		new_file_path=ctx.deps.input_file_path,
+	)
+	if obs.success:
+		ctx.deps.mapping = obs.data
+	await _notify_done(ctx, "map_columns", obs)
+	return obs.output
+
+
+@code_gen_agent.tool
+async def generate_code(ctx: RunContext[AgentDeps], user_instructions: str = "none") -> str:
+	"""Generate a Python transformation script. Run after map_columns."""
+	await _notify_start(ctx, "generate_code")
+	obs = await asyncio.to_thread(
+		tool_generate_code,
+		spec=ctx.deps.spec,
+		mapping=ctx.deps.mapping,
+		new_file_sample=ctx.deps.new_file_sample,
+		user_instructions=user_instructions,
+	)
+	if obs.success:
+		ctx.deps.script_path = obs.data
+	await _notify_done(ctx, "generate_code", obs)
+	return obs.output
+
+
+@code_gen_agent.tool
+async def execute_code(ctx: RunContext[AgentDeps]) -> str:
+	"""Run the generated transformation script."""
+	await _notify_start(ctx, "execute_code")
+	if not ctx.deps.script_path:
+		return "No script generated yet. Call generate_code first."
+	obs = await asyncio.to_thread(
+		tool_execute_code,
+		script_path=ctx.deps.script_path,
+		input_file=ctx.deps.input_file_path,
+	)
+	if obs.success:
+		ctx.deps.output_files = obs.data or []
+	else:
+		ctx.deps.retries += 1
+	result = obs.output
+	if not obs.success and ctx.deps.retries >= 3:
+		result += "\nMax retries reached (3). Consider terminating."
+	await _notify_done(ctx, "execute_code", obs)
+	return result
+
+
+@code_gen_agent.tool
+async def validate_output(ctx: RunContext[AgentDeps]) -> str:
+	"""Validate the generated output against expected format (structural + semantic)."""
+	await _notify_start(ctx, "validate_output")
+	obs = await asyncio.to_thread(
+		tool_validate_output,
+		spec=ctx.deps.spec,
+		mapping=ctx.deps.mapping,
+		input_file=ctx.deps.input_file_path,
+	)
+	await _notify_done(ctx, "validate_output", obs)
+	return obs.output
+
+
+@code_gen_agent.tool
+async def fix_code(ctx: RunContext[AgentDeps], error_message: str) -> str:
+	"""Fix a generated script that failed. Provide the error message."""
+	await _notify_start(ctx, "fix_code")
+	if not ctx.deps.script_path:
+		return "No script to fix. Call generate_code first."
+	obs = await asyncio.to_thread(
+		tool_fix_code,
+		script_path=ctx.deps.script_path,
+		error_message=error_message,
+		spec=ctx.deps.spec,
+		mapping=ctx.deps.mapping,
+	)
+	if obs.success:
+		ctx.deps.script_path = obs.data
+	await _notify_done(ctx, "fix_code", obs)
+	return obs.output
+
+
+@code_gen_agent.tool
+async def ask_human(ctx: RunContext[AgentDeps], question: str) -> str:
+	"""Ask the user a question for clarification or additional context. Only call ONCE per turn, never in parallel with other tools."""
+	if ctx.deps._ask_human_pending:
+		return "Another ask_human is already waiting. Do NOT call ask_human multiple times. Wait for the previous response first."
+	ctx.deps._ask_human_pending = True
+	await _notify_start(ctx, "ask_human")
+	print(f"[agent] ask_human: waiting for human response... question='{question[:80]}'")
+	if ctx.deps.ask_human_fn:
+		obs = await ctx.deps.ask_human_fn(question)
+	else:
+		obs = tool_ask_human(question)
+	ctx.deps._ask_human_pending = False
+	print(f"[agent] ask_human: got response: '{obs.output[:80]}'")
+	await _notify_done(ctx, "ask_human", obs)
+	return obs.output
+
+
+@code_gen_agent.tool
+async def finish(ctx: RunContext[AgentDeps], summary: str) -> str:
+	"""Signal successful completion."""
+	await _notify_start(ctx, "finish")
+	obs = tool_finish(summary)
+	ctx.deps.done = True
+	await _notify_done(ctx, "finish", obs)
+	return obs.output
+
+
+@code_gen_agent.tool
+async def terminate(ctx: RunContext[AgentDeps], reason: str) -> str:
+	"""Stop processing — file cannot be handled."""
+	await _notify_start(ctx, "terminate")
+	obs = tool_terminate(reason)
+	ctx.deps.done = True
+	ctx.deps.terminated = True
+	ctx.deps.terminate_reason = reason
+	await _notify_done(ctx, "terminate", obs)
+	return obs.output
+
+
+class CodeGenAgent:
+	def __init__(
+		self,
+		ask_human_fn: Callable[[str], Awaitable[ObservationResult]] | None = None,
+		on_tool_start: Callable[[int, str], Awaitable[None]] | None = None,
+		on_step: Callable[[int, str, ObservationResult], Awaitable[None]] | None = None,
+	):
+		self.ask_human_fn = ask_human_fn
+		self.on_tool_start = on_tool_start
+		self.on_step = on_step
+
+	async def run(self, input_file_path: str) -> dict:
 		log = logger.bind(file=input_file_path)
 		log.info("starting_agent")
+
 		new_file_sample = get_file_sample(input_file_path)
 
-		# Agent state — Pydantic models passed between tools
-		spec: BusinessLogicSpec | None = None
-		sheet_matches: list[SheetMatch] | None = None
-		mapping: InputMapping | None = None
-		script_path: str | None = None
-		output_files: list[str] = []
-		retries = 0
+		deps = AgentDeps(
+			input_file_path=input_file_path,
+			new_file_sample=new_file_sample,
+			ask_human_fn=self.ask_human_fn,
+			on_tool_start=self.on_tool_start,
+			on_step=self.on_step,
+		)
 
-		messages: list[dict] = [
-			{
-				"role": "user",
-				"content": (
-					f"Process this new input file: {input_file_path}\n\n"
-					f"New file sample:\n{new_file_sample}"
-				),
-			},
-		]
+		print(f"[agent] Starting PydanticAI agent with model: {code_gen_agent.model}")
+		result = await code_gen_agent.run(
+			f"Process this new input file: {input_file_path}\n\n"
+			f"New file sample:\n{new_file_sample}",
+			deps=deps,
+		)
+		print(f"[agent] Agent finished. Output files: {deps.output_files}")
 
-		done = False
-		for step in range(max_steps):
-			log.info("step", current=step + 1, max=max_steps)
-
-			response = await self.client.messages.create(
-				model=self.model,
-				max_tokens=4096,
-				system=SYSTEM_PROMPT,
-				messages=messages,
-				tools=ANTHROPIC_TOOLS,
-				temperature=0.0,
-			)
-
-			# Build assistant message content
-			assistant_content = response.content
-			messages.append({"role": "assistant", "content": assistant_content})
-
-			# Check if there are any tool use blocks
-			tool_use_blocks = [b for b in assistant_content if b.type == "tool_use"]
-
-			if not tool_use_blocks:
-				text = next((b.text for b in assistant_content if b.type == "text"), "")
-				log.warning("no_tool_call", response=text)
-				continue
-
-			tool_results = []
-			for tool_block in tool_use_blocks:
-				fn_name = tool_block.name
-				fn_args = tool_block.input
-				log.info("tool_call", tool=fn_name, args=fn_args)
-
-				if fn_name not in TOOLS:
-					result = f"Unknown tool: {fn_name}"
-					log.error("unknown_tool", tool=fn_name)
-				else:
-					try:
-						observation = self._dispatch_tool(
-							fn_name,
-							fn_args,
-							input_file_path=input_file_path,
-							new_file_sample=new_file_sample,
-							spec=spec,
-							sheet_matches=sheet_matches,
-							mapping=mapping,
-							script_path=script_path,
-						)
-						result = observation.output
-
-						# Update state from tool results
-						if fn_name == "learn_business_logic" and observation.success:
-							spec = observation.data
-
-						if fn_name == "identify_sheets" and observation.success:
-							sheet_matches = observation.data
-
-						if fn_name == "map_columns" and observation.success:
-							mapping = observation.data
-
-						if fn_name == "generate_code" and observation.success:
-							script_path = observation.data
-
-						if fn_name == "fix_code" and observation.success:
-							script_path = observation.data
-
-						if fn_name == "execute_code" and observation.success:
-							output_files = observation.data or []
-							log.info("output_files", files=output_files)
-
-						if fn_name == "execute_code" and not observation.success:
-							retries += 1
-							if retries >= 3:
-								result += "\nMax retries reached (3). Consider terminating."
-
-						if fn_name == "finish":
-							log.info(
-								"agent_finished",
-								summary=result,
-								output_files=output_files,
-							)
-							done = True
-
-						if fn_name == "terminate":
-							log.warning("agent_terminated", reason=result)
-							done = True
-
-						if observation.success:
-							log.info("observation_ok", tool=fn_name, output=result[:500])
-						else:
-							log.error("observation_failed", tool=fn_name, output=result[:500])
-
-					except Exception as e:
-						result = f"Tool raised an exception: {e}"
-						log.exception("tool_exception", tool=fn_name, args=fn_args)
-
-				tool_results.append(
-					{
-						"type": "tool_result",
-						"tool_use_id": tool_block.id,
-						"content": result,
-					}
-				)
-
-			messages.append({"role": "user", "content": tool_results})
-
-			if done:
-				break
+		log.info("agent_finished", output_files=deps.output_files)
 
 		return {
-			"messages": messages[-1],
-			"output_files": output_files,
+			"messages": json.loads(result.all_messages_json())[-1],
+			"output_files": deps.output_files,
+			"terminated": deps.terminated,
+			"terminate_reason": deps.terminate_reason,
 		}
-
-	def _dispatch_tool(
-		self,
-		fn_name: str,
-		fn_args: dict,
-		*,
-		input_file_path: str,
-		new_file_sample: str,
-		spec: BusinessLogicSpec | None,
-		sheet_matches: list[SheetMatch] | None,
-		mapping: InputMapping | None,
-		script_path: str | None,
-	) -> ObservationResult:
-		"""Dispatch tool call with injected state."""
-
-		if fn_name == "learn_business_logic":
-			return TOOLS[fn_name]()
-
-		if fn_name == "identify_sheets":
-			return TOOLS[fn_name](spec=spec, new_file_sample=new_file_sample)
-
-		if fn_name == "map_columns":
-			return TOOLS[fn_name](
-				spec=spec,
-				sheet_matches=sheet_matches,
-				new_file_path=input_file_path,
-			)
-
-		if fn_name == "generate_code":
-			return TOOLS[fn_name](
-				spec=spec,
-				mapping=mapping,
-				new_file_sample=new_file_sample,
-				user_instructions=fn_args.get("user_instructions", "none"),
-			)
-
-		if fn_name == "execute_code":
-			if not script_path:
-				return ObservationResult(
-					tool="execute_code",
-					success=False,
-					output="No script generated yet. Call generate_code first.",
-				)
-			return TOOLS[fn_name](
-				script_path=script_path,
-				input_file=input_file_path,
-			)
-
-		if fn_name == "validate_output":
-			return TOOLS[fn_name](
-				spec=spec,
-				mapping=mapping,
-				input_file=input_file_path,
-			)
-
-		if fn_name == "fix_code":
-			if not script_path:
-				return ObservationResult(
-					tool="fix_code",
-					success=False,
-					output="No script to fix. Call generate_code first.",
-				)
-			return TOOLS[fn_name](
-				script_path=script_path,
-				error_message=fn_args.get("error_message", ""),
-				spec=spec,
-				mapping=mapping,
-			)
-
-		# Simple tools: ask_human, finish, terminate
-		return TOOLS[fn_name](**fn_args)
 
 
 if __name__ == "__main__":

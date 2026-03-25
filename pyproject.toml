@@ -39,3 +39,8 @@ ignore = [
     "W191",  # tab indentation (handled by formatter)
     "E101",  # mixed spaces and tabs (handled by formatter)
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.7",
+]

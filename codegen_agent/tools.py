@@ -531,9 +531,7 @@ def tool_execute_code(
 		if success:
 			after = _signature_map()
 			output_files = sorted(
-				str(path)
-				for path, signature in after.items()
-				if before.get(path) != signature
+				str(path) for path, signature in after.items() if before.get(path) != signature
 			)
 
 		if output_files:

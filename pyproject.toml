@@ -17,6 +17,7 @@ dependencies = [
     "tabulate>=0.10.0",
     "pytest>=8.0.0",
     "langchain>=1.2.13",
+    "ruff>=0.15.8",
 ]
 
 [project.scripts]

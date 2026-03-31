@@ -44,6 +44,28 @@
       "args": ["${input:inputFile}"]
     },
     {
+      "name": "Orchestrator (Excel only)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "orchestrator.agent",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env",
+      "args": ["${input:userObjective}", "${input:excelFile}"]
+    },
+    {
+      "name": "Orchestrator (Excel + SOP)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "orchestrator.agent",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env",
+      "args": ["${input:userObjective}", "${input:excelFile}", "${input:docxFile}"]
+    },
+    {
       "name": "Process (execution agent)",
       "type": "debugpy",
       "request": "launch",
@@ -61,6 +83,24 @@
       "type": "promptString",
       "description": "Path to Excel input file",
       "default": "./inputs/[Simple] Bill processing_tampered.xlsx"
+    },
+    {
+      "id": "userObjective",
+      "type": "promptString",
+      "description": "What does the user want to achieve?",
+      "default": "transform vendor payments into standard audit format"
+    },
+    {
+      "id": "excelFile",
+      "type": "promptString",
+      "description": "Path to Excel file",
+      "default": "./inputs/[Simple] Bill processing_tampered.xlsx"
+    },
+    {
+      "id": "docxFile",
+      "type": "promptString",
+      "description": "Path to Word/SOP file (leave blank if not needed)",
+      "default": ""
     }
   ]
 }

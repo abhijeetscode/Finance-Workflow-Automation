@@ -1,12 +1,12 @@
 {
   "input_sheets": [
     {
-      "semantic_role": "Primary Vendor Invoice Data",
-      "description": "Main transactional data containing vendor invoices to be processed for payment. This sheet is identified by a sheet name starting with 'report' and contains all invoice details including vendor information, amounts, dates, and payment status.",
+      "semantic_role": "Primary Vendor Payment Records",
+      "description": "Main dataset containing vendor invoices with payment details, amounts, dates, and approval status. This is the working dataset that gets filtered and enriched through the processing pipeline.",
       "columns": [
         {
           "semantic_name": "Vendor Name",
-          "description": "The name of the vendor/supplier submitting the invoice. Subject to standardization via the Vendor Name Changes sheet.",
+          "description": "Legal name of the vendor/supplier providing goods or services. Used for matching against hold lists and name correction mappings.",
           "data_type": "string",
           "example_values": [
             "DataStream Analytics",
@@ -15,81 +15,86 @@
             "HealthCare Supplies Plus"
           ],
           "identifying_patterns": [
-            "Company names with mixed case",
-            "May contain business entity indicators (LLC, Inc, Co)",
-            "Subject to name corrections/standardization"
+            "Company names with proper capitalization",
+            "May contain LLC, Inc, Co suffixes",
+            "Matched against Payment Hold List and Vendor Name Changes sheets"
           ],
           "critical": true
         },
         {
           "semantic_name": "Invoice Number",
-          "description": "Unique identifier for the invoice. Used to deduplicate against previously uploaded invoices and track payment status.",
+          "description": "Unique identifier for each invoice. Primary key used to deduplicate against previously uploaded and unpaid invoice lists.",
           "data_type": "string",
           "example_values": [
             "INV-62809",
             "INV-71016",
             "INV-34733",
-            "INV-67916"
+            "INV-67916",
+            "INV-54900"
           ],
           "identifying_patterns": [
-            "Alphanumeric format with 'INV-' prefix",
-            "Followed by numeric identifier",
-            "Used as primary deduplication key"
+            "Format: INV-##### (5 digits)",
+            "Unique across all records",
+            "Used for cross-sheet matching"
           ],
           "critical": true
         },
         {
           "semantic_name": "Invoice Date",
-          "description": "The date the invoice was issued by the vendor. Normalized to MM/DD/YY format and updated if in the past relative to processing date.",
+          "description": "Date when the invoice was issued by the vendor. Normalized to current month/year if in past periods.",
           "data_type": "date",
           "example_values": [
             "10/16/25",
             "10/26/25",
+            "10/09/25",
             "09/14/25"
           ],
           "identifying_patterns": [
-            "Date format MM/DD/YY",
-            "Subject to normalization and forward-dating logic",
-            "May be updated during processing"
+            "Format: M/D/YY",
+            "Dates in past months updated to processing date",
+            "Converted to datetime during processing"
           ],
-          "critical": true
+          "critical": false
         },
         {
           "semantic_name": "Due Date",
-          "description": "The date by which payment is due to the vendor. Normalized to MM/DD/YY format and updated if in the past relative to processing date.",
+          "description": "Payment deadline for the invoice. Used to determine payment urgency and workflow priority.",
           "data_type": "date",
           "example_values": [
             "10/28/25",
             "10/03/25",
-            "10/04/25"
+            "10/04/25",
+            "10/19/25",
+            "10/16/25"
           ],
           "identifying_patterns": [
-            "Date format MM/DD/YY",
-            "Subject to normalization and forward-dating logic",
-            "May be updated during processing"
+            "Format: M/D/YY",
+            "May be before or after invoice date",
+            "Normalized during processing"
           ],
-          "critical": true
+          "critical": false
         },
         {
           "semantic_name": "Amount",
-          "description": "The invoice amount in currency. Formatted to remove .00 suffix from whole numbers.",
-          "data_type": "numeric",
+          "description": "Invoice amount in currency (USD). Critical for financial reporting and payment totals. Formatted to remove .00 from whole numbers.",
+          "data_type": "float",
           "example_values": [
             "2276.88",
             "3745.2",
             "3008.24",
-            "1792.73"
+            "1792.73",
+            "1145.85"
           ],
           "identifying_patterns": [
-            "Decimal numeric values",
-            "Represents monetary amounts",
-            "Formatted for output (whole numbers without decimals)"
+            "Numeric values with 2 decimal places",
+            "Positive amounts only",
+            "Summed for final payment total reporting"
           ],
           "critical": true
         },
         {
           "semantic_name": "Category",
-          "description": "Business category or expense classification for the invoice (e.g., Office Supplies, Consulting, Marketing, Services, Technology).",
+          "description": "Business classification or expense category for the invoice (e.g., Office Supplies, Consulting, Marketing, Services, Technology).",
           "data_type": "string",
           "example_values": [
             "Office Supplies",
@@ -100,14 +105,13 @@
           ],
           "identifying_patterns": [
             "Predefined category values",
-            "Used for expense classification",
-            "Consistent across invoices"
+            "Used for expense classification and reporting"
           ],
           "critical": false
         },
         {
           "semantic_name": "Description",
-          "description": "Text description of the goods or services provided in the invoice.",
+          "description": "Narrative description of goods or services provided. Typically follows pattern 'Payment for [category] services'.",
           "data_type": "string",
           "example_values": [
             "Payment for office supplies services",
@@ -115,15 +119,15 @@
             "Payment for marketing services"
           ],
           "identifying_patterns": [
-            "Free-form text field",
-            "Describes nature of transaction",
-            "Often follows pattern 'Payment for [service] services'"
+            "Descriptive text",
+            "Often contains 'Payment for' prefix",
+            "May be redundant with Category field"
           ],
           "critical": false
         },
         {
           "semantic_name": "Status",
-          "description": "Current payment processing status of the invoice (e.g., Pending, Processing, Approved).",
+          "description": "Current workflow state of the payment (Pending, Processing, Approved). Indicates position in approval pipeline.",
           "data_type": "string",
           "example_values": [
             "Pending",
@@ -131,31 +135,32 @@
             "Approved"
           ],
           "identifying_patterns": [
-            "Predefined status values",
-            "Indicates workflow stage",
-            "May influence payment processing decisions"
+            "Enumerated values: Pending, Processing, Approved",
+            "Reflects payment authorization state"
           ],
           "critical": false
         },
         {
           "semantic_name": "Approval Date",
-          "description": "The date the invoice was approved for payment. Normalized to MM/DD/YY format and updated if in the past relative to processing date.",
+          "description": "Date when the payment was approved. Normalized to current month/year if in past periods.",
           "data_type": "date",
           "example_values": [
             "10/31/25",
             "10/07/25",
-            "10/22/25"
+            "10/22/25",
+            "10/23/25",
+            "10/14/25"
           ],
           "identifying_patterns": [
-            "Date format MM/DD/YY",
-            "Subject to normalization and forward-dating logic",
-            "May be updated during processing"
+            "Format: M/D/YY",
+            "Dates in past months updated to processing date",
+            "May be null for non-approved payments"
           ],
           "critical": false
         },
         {
           "semantic_name": "Payment Method",
-          "description": "The method by which payment will be made to the vendor (e.g., Wire Transfer, ACH, Check).",
+          "description": "Mechanism for payment delivery (Wire Transfer, ACH, Check). Determines payment processing method.",
           "data_type": "string",
           "example_values": [
             "Wire Transfer",
@@ -163,38 +168,37 @@
             "Check"
           ],
           "identifying_patterns": [
-            "Predefined payment method values",
-            "Indicates payment processing mechanism",
-            "Consistent across invoices"
+            "Enumerated values: Wire Transfer, ACH, Check",
+            "Determines payment routing"
           ],
           "critical": false
         }
       ],
       "identifying_traits": [
-        "Sheet name starts with 'report'",
-        "Contains 10 columns with vendor and invoice details",
-        "Multiple rows of invoice transactions",
-        "Includes financial amounts and date fields",
-        "Contains status indicators for payment workflow"
+        "Sheet name starts with 'report' followed by numeric identifier",
+        "Contains 150+ rows of invoice records",
+        "Includes vendor names, invoice identifiers, and monetary amounts",
+        "Has workflow status field (Pending, Processing, Approved)",
+        "Contains multiple date fields for invoice lifecycle tracking"
       ],
       "critical": true
     },
     {
       "semantic_role": "Payment Hold List",
-      "description": "A blocklist of vendor names whose payments should be excluded from processing. Any invoice from a vendor on this list is filtered out and tracked separately.",
+      "description": "Blocklist of vendor names whose payments should be excluded from processing. Acts as a filter to prevent payments to specified vendors.",
       "columns": [
         {
           "semantic_name": "Vendor Name",
-          "description": "Name of vendor whose payments are on hold and should be excluded from processing.",
+          "description": "Name of vendor placed on payment hold. Matched case-insensitively against vendor names in primary sheet to exclude their invoices.",
           "data_type": "string",
           "example_values": [
             "Metro Cleaning Services",
             "BuildRight Construction"
           ],
           "identifying_patterns": [
-            "Vendor names matching those in primary invoice sheet",
-            "Case-insensitive matching used for comparison",
-            "Represents vendors with payment holds/blocks"
+            "Company names",
+            "Matched case-insensitively against primary sheet",
+            "Used to filter out records"
           ],
           "critical": true
         }
@@ -202,18 +206,18 @@
       "identifying_traits": [
         "Sheet named 'Payment Hold List'",
         "Single column containing vendor names",
-        "Small reference table (typically 2-10 rows)",
-        "Used for filtering/exclusion logic"
+        "Small dataset (2-10 rows typically)",
+        "Vendor names match against primary sheet for filtering"
       ],
       "critical": true
     },
     {
       "semantic_role": "Vendor Name Standardization Mapping",
-      "description": "A lookup table that maps original/incorrect vendor names to their standardized/corrected forms. Used to normalize vendor names in the primary invoice data.",
+      "description": "Lookup table for correcting and standardizing vendor names. Maps original/legacy vendor names to their current correct names.",
       "columns": [
         {
           "semantic_name": "Original Vendor Name",
-          "description": "The original or incorrect vendor name as it appears in source data.",
+          "description": "Legacy or incorrect vendor name that may appear in invoice records.",
           "data_type": "string",
           "example_values": [
             "TechGear Solutions LLC",
@@ -221,15 +225,14 @@
             "DataStream Analytics"
           ],
           "identifying_patterns": [
-            "Vendor names with variations or abbreviations",
-            "May include incorrect entity type indicators",
-            "Serves as lookup key for name mapping"
+            "Vendor names with variations (LLC, Co, Inc suffixes)",
+            "Matched exactly against primary sheet vendor names"
           ],
           "critical": true
         },
         {
           "semantic_name": "Corrected Vendor Name",
-          "description": "The standardized/corrected vendor name to replace the original.",
+          "description": "Standardized, current legal name for the vendor. Replaces original name in processed records.",
           "data_type": "string",
           "example_values": [
             "TechGear Solutions Inc",
@@ -238,55 +241,56 @@
           ],
           "identifying_patterns": [
             "Standardized vendor names",
-            "Corrected entity type indicators",
-            "Serves as replacement value in mapping"
+            "Target names for replacement"
           ],
           "critical": true
         }
       ],
       "identifying_traits": [
         "Sheet named 'Vendor Name Changes'",
-        "Two columns: original and corrected vendor names",
-        "Small reference table (typically 3-20 rows)",
-        "Used for name normalization/standardization"
+        "Two columns: original and corrected names",
+        "Small reference dataset (3-20 rows)",
+        "Used to normalize vendor names before processing"
       ],
       "critical": true
     },
     {
-      "semantic_role": "Previously Uploaded Invoice Registry",
-      "description": "Historical record of all invoices that have been uploaded/processed in the past. Used in conjunction with Unpaid Uploads to identify which previously uploaded invoices have now been paid and should be excluded from current processing.",
+      "semantic_role": "Previously Processed Invoice Registry",
+      "description": "Historical record of all invoices that have been uploaded/processed in previous runs. Used to identify and exclude paid invoices from current processing.",
       "columns": [
         {
           "semantic_name": "Invoice Number",
-          "description": "Unique identifier for invoices that were previously uploaded. Used to match against current invoice data.",
+          "description": "Unique invoice identifier from previously processed batches. Matched against current invoices to identify duplicates.",
           "data_type": "string",
           "example_values": [
             "INV-97289",
             "INV-96679",
             "INV-65095",
-            "INV-44232"
+            "INV-44232",
+            "INV-56831"
           ],
           "identifying_patterns": [
-            "Alphanumeric format with 'INV-' prefix",
+            "Format: INV-##### (5 digits)",
             "Matches invoice numbers in primary sheet",
-            "Used for deduplication logic"
+            "Used to exclude paid invoices"
           ],
           "critical": true
         },
         {
           "semantic_name": "Upload Date",
-          "description": "The date the invoice was previously uploaded/processed.",
+          "description": "Date when the invoice was previously uploaded/processed. Provides audit trail of processing history.",
           "data_type": "date",
           "example_values": [
             "10/22/25",
             "09/07/25",
             "09/03/25",
-            "08/06/25"
+            "08/06/25",
+            "09/02/25"
           ],
           "identifying_patterns": [
-            "Date format MM/DD/YY",
-            "Indicates when invoice was previously processed",
-            "Used for audit trail"
+            "Format: M/D/YY",
+            "Historical dates",
+            "Indicates when invoice was last processed"
           ],
           "critical": false
         }
@@ -294,46 +298,48 @@
       "identifying_traits": [
         "Sheet named 'Previously Uploaded Sheet'",
         "Two columns: invoice number and upload date",
-        "Larger reference table (typically 20-100+ rows)",
-        "Tracks historical invoice uploads"
+        "Larger dataset (30+ rows) tracking historical uploads",
+        "Invoice numbers matched against primary sheet for deduplication"
       ],
       "critical": true
     },
     {
       "semantic_role": "Unpaid Invoice Tracking",
-      "description": "Registry of invoices that remain unpaid. Used in conjunction with Previously Uploaded Sheet to identify paid invoices (those in Previously Uploaded but NOT in Unpaid Uploads) which should be excluded from current processing.",
+      "description": "Registry of invoices from previously uploaded batches that remain unpaid. Used to identify which historical invoices should still be included in current processing.",
       "columns": [
         {
           "semantic_name": "Invoice Number",
-          "description": "Unique identifier for invoices that remain unpaid. Used to identify which previously uploaded invoices have been paid.",
+          "description": "Unique invoice identifier for unpaid invoices. Invoices in this list are NOT removed from processing (they remain unpaid).",
           "data_type": "string",
           "example_values": [
             "INV-17660",
             "INV-11412",
             "INV-36277",
-            "INV-33277"
+            "INV-33277",
+            "INV-85411"
           ],
           "identifying_patterns": [
-            "Alphanumeric format with 'INV-' prefix",
-            "Subset of invoices from Previously Uploaded Sheet",
-            "Used for deduplication logic"
+            "Format: INV-##### (5 digits)",
+            "Subset of Previously Uploaded invoices",
+            "Excluded from removal logic"
           ],
           "critical": true
         },
         {
           "semantic_name": "Days Outstanding",
-          "description": "Number of days the invoice has been outstanding/unpaid since the upload date.",
-          "data_type": "numeric",
+          "description": "Number of days since invoice was issued and remains unpaid. Indicates payment aging and urgency.",
+          "data_type": "integer",
           "example_values": [
             "29",
             "33",
+            "29",
             "23",
             "44"
           ],
           "identifying_patterns": [
-            "Integer numeric values",
-            "Represents aging of unpaid invoices",
-            "Used for payment priority/aging analysis"
+            "Positive integer values",
+            "Indicates invoice age",
+            "Used for aging analysis"
           ],
           "critical": false
         }
@@ -341,8 +347,8 @@
       "identifying_traits": [
         "Sheet named 'Unpaid Uploads'",
         "Two columns: invoice number and days outstanding",
-        "Smaller reference table (typically 5-20 rows)",
-        "Tracks invoices with outstanding payment status"
+        "Smaller dataset (10-20 rows) of outstanding invoices",
+        "Invoices in this list are excluded from the 'paid' set"
       ],
       "critical": true
     }
@@ -631,160 +637,151 @@
   ],
   "transformation_rules": [
     {
-      "name": "Load Primary Invoice Data",
-      "description": "Load all vendor invoice records from the source sheet identified by name starting with 'report'",
+      "name": "Load Source Data",
+      "description": "Load all vendor payment records from the primary source sheet (sheet name starting with 'report')",
       "input_roles": [
-        "Primary Vendor Invoice Data"
+        "Primary Vendor Payment Records"
       ],
       "output_sheet": "Raw Data",
-      "logic": "Read Excel sheet where sheet_name.lower().startswith('report'); preserve all columns and values without modification"
+      "logic": "Read Excel sheet matching pattern 'report*' and preserve all columns and values without modification"
     },
     {
-      "name": "Filter Payment Hold Vendors",
-      "description": "Remove invoices from vendors listed in the Payment Hold List using case-insensitive vendor name matching",
+      "name": "Filter Payment Holds",
+      "description": "Remove invoices from vendors listed on the Payment Hold List to prevent payments to blocked vendors",
       "input_roles": [
-        "Primary Vendor Invoice Data",
+        "Primary Vendor Payment Records",
         "Payment Hold List"
       ],
       "output_sheet": "Payment Holds",
-      "logic": "For each row in Primary Vendor Invoice Data, check if Vendor Name (case-insensitive) exists in Payment Hold List. If match found, exclude from Vendor Payments and include in Payment Holds sheet"
+      "logic": "Case-insensitive match of Vendor Name against Payment Hold List; exclude matching records from main processing and segregate to Payment Holds sheet"
     },
     {
-      "name": "Normalize Date Fields",
-      "description": "Convert Invoice Date, Due Date, and Approval Date to MM/DD/YY format; forward-date any dates in the past relative to processing date",
+      "name": "Normalize Past Dates",
+      "description": "Update invoice dates, due dates, and approval dates that are in past months/years to the current processing date",
       "input_roles": [
-        "Primary Vendor Invoice Data"
+        "Primary Vendor Payment Records"
       ],
       "output_sheet": "Vendor Payments",
-      "logic": "For each date field (Invoice Date, Due Date, Approval Date): (1) Parse as datetime; (2) If date.year < current_year OR (date.year == current_year AND date.month < current_month), replace with processing_date; (3) Format as M/D/YY (remove leading zeros)"
+      "logic": "For each date field (Invoice Date, Due Date, Approval Date): if date.year < current_year OR (date.year == current_year AND date.month < current_month), replace with processing_date; convert to M/D/YY format"
     },
     {
       "name": "Standardize Vendor Names",
-      "description": "Replace original vendor names with corrected standardized names using the Vendor Name Changes mapping table",
+      "description": "Replace original/legacy vendor names with corrected standardized names using the Vendor Name Changes mapping table",
       "input_roles": [
-        "Primary Vendor Invoice Data",
+        "Primary Vendor Payment Records",
         "Vendor Name Standardization Mapping"
       ],
       "output_sheet": "Vendor Payments",
-      "logic": "For each row, lookup Vendor Name in Vendor Name Changes mapping. If Original Vendor Name matches, replace with Corrected Vendor Name. Otherwise, keep original value"
+      "logic": "Exact match lookup: if Vendor Name exists in Original Vendor Name column, replace with corresponding Corrected Vendor Name value"
     },
     {
       "name": "Remove Previously Paid Invoices",
-      "description": "Exclude invoices that have been previously uploaded and are now paid (in Previously Uploaded but not in Unpaid Uploads)",
+      "description": "Exclude invoices that have been previously uploaded and marked as paid (in Previously Uploaded but not in Unpaid Uploads)",
       "input_roles": [
-        "Primary Vendor Invoice Data",
-        "Previously Uploaded Invoice Registry",
+        "Primary Vendor Payment Records",
+        "Previously Processed Invoice Registry",
         "Unpaid Invoice Tracking"
       ],
       "output_sheet": "Previously Uploaded",
-      "logic": "Calculate paid_invoices = (Previously Uploaded Sheet Invoice Numbers) - (Unpaid Uploads Invoice Numbers). For each row in Primary Vendor Invoice Data, if Invoice Number is in paid_invoices set, exclude from Vendor Payments and include in Previously Uploaded sheet"
+      "logic": "Calculate paid_invoices = Previously_Uploaded - Unpaid_Uploads; exclude any Invoice Number in paid_invoices from main processing; segregate removed records to Previously Uploaded sheet"
     },
     {
-      "name": "Generate Bill Payment ID",
-      "description": "Assign sequential payment identifiers starting from 1 to each processed invoice record",
+      "name": "Generate Bill Payment IDs",
+      "description": "Assign sequential unique identifiers to each processed payment record for Bill.com integration",
       "input_roles": [
-        "Primary Vendor Invoice Data"
+        "Primary Vendor Payment Records"
       ],
       "output_sheet": "Vendor Payments",
-      "logic": "After all filtering and transformations, assign Bill Payment ID = row_number (1-indexed) for each remaining record in sequential order"
+      "logic": "Generate sequential integers starting from 1 for each row in the filtered dataset; assign to Bill Payment ID column"
     },
     {
       "name": "Assign GL Account",
-      "description": "Assign constant GL Account code 60000 to all processed payment records",
+      "description": "Assign constant general ledger account code to all payment records for accounting classification",
       "input_roles": [
-        "Primary Vendor Invoice Data"
+        "Primary Vendor Payment Records"
       ],
       "output_sheet": "Vendor Payments",
-      "logic": "For all rows in final Vendor Payments output, set GL Account = '60000'"
+      "logic": "Set GL Account = '60000' for all records in the final payment dataset"
     },
     {
       "name": "Format Amount Values",
-      "description": "Remove .00 decimal suffix from whole number amounts while preserving decimal values",
+      "description": "Remove .00 decimal suffix from whole number amounts for cleaner output formatting",
       "input_roles": [
-        "Primary Vendor Invoice Data"
+        "Primary Vendor Payment Records"
       ],
       "output_sheet": "Vendor Payments",
-      "logic": "For each Amount value: convert to float; if value == int(value), output as integer; otherwise output as decimal number"
+      "logic": "For each Amount value: if value == int(value), convert to integer; otherwise preserve as float with decimal places"
     },
     {
       "name": "Format Date Output",
-      "description": "Remove leading zeros from month and day in date fields for final output",
+      "description": "Normalize date formatting to remove leading zeros from month and day components",
       "input_roles": [
-        "Primary Vendor Invoice Data"
+        "Primary Vendor Payment Records"
       ],
       "output_sheet": "Vendor Payments",
-      "logic": "For each date field in output, split by '/'; convert month and day to int (removes leading zeros); rejoin as M/D/YY format"
-    },
-    {
-      "name": "Pass-Through Non-Transformed Fields",
-      "description": "Copy Invoice Number, Category, Description, Status, and Payment Method without transformation",
-      "input_roles": [
-        "Primary Vendor Invoice Data"
-      ],
-      "output_sheet": "Vendor Payments",
-      "logic": "For fields Invoice Number, Category, Description, Status, Payment Method: copy values directly from source to output without modification"
+      "logic": "For each date field: parse M/D/YY format and reconstruct as int(month)/int(day)/YY to remove leading zeros (e.g., '02/04/26' becomes '2/4/26')"
     }
   ],
   "semantic_validations": [
     {
       "name": "Invoice Number Uniqueness",
-      "description": "Verify that Invoice Number values are unique within the Primary Vendor Invoice Data to ensure proper deduplication",
-      "check_logic": "For each Invoice Number in Primary Vendor Invoice Data, count occurrences. Alert if any Invoice Number appears more than once in source data"
+      "description": "Verify that all Invoice Numbers in the final Vendor Payments output are unique and no duplicates exist",
+      "check_logic": "Count distinct Invoice Numbers should equal total row count in Vendor Payments sheet; no Invoice Number should appear more than once"
     },
     {
-      "name": "Payment Hold List Matching",
-      "description": "Validate that vendor names in Payment Hold List match vendors in Primary Vendor Invoice Data (case-insensitive) to ensure holds are applied correctly",
-      "check_logic": "For each vendor in Payment Hold List, check if at least one matching vendor exists in Primary Vendor Invoice Data (case-insensitive comparison). Log warnings for hold vendors with no matching invoices"
+      "name": "Payment Hold Exclusion",
+      "description": "Verify that no vendor names from the Payment Hold List appear in the final Vendor Payments output",
+      "check_logic": "Intersect(Vendor Payments.Vendor Name, Payment Hold List.Vendor Name) should be empty set; case-insensitive comparison"
     },
     {
-      "name": "Vendor Name Mapping Completeness",
-      "description": "Verify that all vendors requiring standardization have entries in Vendor Name Changes mapping",
-      "check_logic": "For each Original Vendor Name in Vendor Name Changes, verify that Corrected Vendor Name is non-empty and different from original. Alert if mapping is circular or incomplete"
-    },
-    {
-      "name": "Previously Uploaded Invoice Validity",
-      "description": "Validate that invoices marked as previously uploaded exist in the Previously Uploaded Sheet and have corresponding entries in Unpaid Uploads for tracking",
-      "check_logic": "For each Invoice Number in Unpaid Uploads, verify it exists in Previously Uploaded Sheet. Alert if unpaid invoice has no upload history record"
-    },
-    {
-      "name": "Date Format Consistency",
-      "description": "Ensure all date fields (Invoice Date, Due Date, Approval Date) are in valid MM/DD/YY format after normalization",
-      "check_logic": "For each date field in output, verify format matches pattern M/D/YY or MM/DD/YY (no leading zeros on month/day). Alert if any date fails to parse or format correctly"
-    },
-    {
-      "name": "Amount Value Validity",
-      "description": "Verify that all Amount values are positive numeric values and properly formatted in output",
-      "check_logic": "For each Amount in output, verify value is numeric and >= 0. Alert if any amount is negative, null, or non-numeric"
+      "name": "Previously Paid Exclusion",
+      "description": "Verify that no paid invoices (Previously Uploaded minus Unpaid Uploads) appear in the final Vendor Payments output",
+      "check_logic": "Intersect(Vendor Payments.Invoice Number, paid_invoices) should be empty set where paid_invoices = Previously_Uploaded - Unpaid_Uploads"
     },
     {
       "name": "Bill Payment ID Sequentiality",
-      "description": "Validate that Bill Payment IDs are sequential integers starting from 1 with no gaps",
-      "check_logic": "For Bill Payment ID column in Vendor Payments output, verify values are 1, 2, 3, ..., N where N = row count. Alert if any ID is missing, duplicated, or out of sequence"
+      "description": "Verify that Bill Payment IDs form a continuous sequence starting from 1 with no gaps",
+      "check_logic": "Bill Payment ID values should be [1, 2, 3, ..., n] where n = row count; no missing or duplicate IDs"
     },
     {
       "name": "GL Account Consistency",
-      "description": "Verify that all records in Vendor Payments have GL Account = '60000'",
-      "check_logic": "For each row in Vendor Payments output, verify GL Account = '60000'. Alert if any row has different value"
+      "description": "Verify that all records in Vendor Payments have GL Account set to the constant value '60000'",
+      "check_logic": "All GL Account values in Vendor Payments should equal '60000'; no null or alternative values"
     },
     {
-      "name": "Filtering Logic Correctness",
-      "description": "Validate that final Vendor Payments output excludes all payment holds and previously paid invoices",
-      "check_logic": "Verify that no invoice in Vendor Payments has vendor name matching Payment Hold List (case-insensitive). Verify that no invoice in Vendor Payments has Invoice Number in (Previously Uploaded - Unpaid Uploads)"
+      "name": "Vendor Name Standardization Completeness",
+      "description": "Verify that all vendor names in Vendor Payments match the Corrected Vendor Name values from the mapping table where applicable",
+      "check_logic": "For each Original Vendor Name in Vendor Name Changes, verify no instances remain in Vendor Payments output; all should be replaced with Corrected Vendor Name"
     },
     {
-      "name": "Output Record Count Accuracy",
-      "description": "Validate that output record counts match expected filtering logic: final_count = original_count - holds_removed - paid_removed",
-      "check_logic": "Calculate expected_final = original_count - len(Payment Holds output) - len(Previously Uploaded output). Verify actual Vendor Payments row count equals expected_final"
+      "name": "Date Format Consistency",
+      "description": "Verify that all date fields (Invoice Date, Due Date, Approval Date) follow the M/D/YY format without leading zeros",
+      "check_logic": "All date values should match regex pattern ^\\d{1,2}/\\d{1,2}/\\d{2}$ (no leading zeros on month/day); null values are acceptable"
     },
     {
-      "name": "Required Field Non-Null Validation",
-      "description": "Ensure critical fields (Vendor Name, Invoice Number, Amount) are non-null in final output",
-      "check_logic": "For each row in Vendor Payments output, verify Vendor Name is non-empty, Invoice Number is non-empty, and Amount is non-null. Alert if any critical field is missing"
+      "name": "Amount Data Type Integrity",
+      "description": "Verify that Amount values are properly formatted as integers (no .00) or floats with decimal places",
+      "check_logic": "Whole number amounts should not contain decimal point; fractional amounts should preserve decimal places; all values should be numeric"
     },
     {
-      "name": "Vendor Name Standardization Application",
-      "description": "Verify that vendor name standardization was applied correctly and no original unmapped names remain in output",
-      "check_logic": "For each Vendor Name in Vendor Payments output, check if it appears in Original Vendor Name column of Vendor Name Changes. If found, alert that standardization was not applied"
+      "name": "Raw Data Completeness",
+      "description": "Verify that Raw Data sheet contains all original records from the source sheet without any filtering",
+      "check_logic": "Row count in Raw Data should equal original source sheet row count; all columns and values should be preserved exactly"
+    },
+    {
+      "name": "Audit Trail Reconciliation",
+      "description": "Verify that the sum of records across all output sheets equals the original input count",
+      "check_logic": "Vendor Payments + Payment Holds + Previously Uploaded = Raw Data row count; no records should be lost or duplicated across sheets"
+    },
+    {
+      "name": "Status Field Validity",
+      "description": "Verify that Status field values are limited to enumerated values: Pending, Processing, or Approved",
+      "check_logic": "All Status values in Vendor Payments should be one of: 'Pending', 'Processing', 'Approved'; no other values allowed"
+    },
+    {
+      "name": "Payment Method Validity",
+      "description": "Verify that Payment Method field values are limited to enumerated values: Wire Transfer, ACH, or Check",
+      "check_logic": "All Payment Method values in Vendor Payments should be one of: 'Wire Transfer', 'ACH', 'Check'; no other values allowed"
     }
   ],
   "output_file_format": "xlsx + csv"

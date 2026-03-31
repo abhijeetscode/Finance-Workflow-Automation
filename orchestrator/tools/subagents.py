@@ -11,6 +11,7 @@ def log_run(files: str, intent: str, agent_used: str, outcome: str) -> str:
 	    outcome: 'success' or 'failure'
 	"""
 	from orchestrator.memory.store import save_run
+
 	file_list = [f.strip() for f in files.split(",") if f.strip()]
 	save_run(files=file_list, intent=intent, agent=agent_used, outcome=outcome)
 	return "Run saved to memory."
@@ -28,20 +29,26 @@ def invoke_codegen_agent(file_path: str, instructions: str) -> str:
 	"""Delegate to the code generation agent to transform an Excel file into standard output format."""
 	try:
 		from codegen_agent import CodeGenAgent
+
 		agent = CodeGenAgent()
 		result = agent.run(input_file_path=file_path)
 		files = result.get("output_files", [])
+
+		# Primary signal: new files detected by directory snapshot
 		if files:
 			paths = "\n".join(f"  - {f}" for f in files)
-			return f"Transformation complete. Output files saved to:\n{paths}"
-		return "CodeGen agent completed but no output files were detected. Check the ./outputs directory."
+			return f"SUCCESS: Transformation complete. Output files:\n{paths}"
+
+		return "FAILURE: CodeGen agent completed without producing output files. The agent already attempted internal retries — do not retry."
 	except Exception as e:
-		return f"CodeGen agent failed: {e}"
+		return f"FAILURE: CodeGen agent raised an exception: {e}"
 
 
 @tool
 def invoke_sop_agent(file_path: str, instructions: str) -> str:
 	"""Delegate to the SOP agent to execute steps from an SOP document."""
 	from orchestrator.sop_agent import run
+
 	result = run(file_path=file_path, instructions=instructions)
-	return result["message"]
+	status = "SUCCESS" if result.get("status") != "failure" else "FAILURE"
+	return f"{status}: {result['message']}"

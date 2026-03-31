@@ -511,33 +511,48 @@ def tool_execute_code(
 	    stdout + stderr from the script.
 	"""
 	cmd = [sys.executable, script_path, input_file, output_dir]
-	# Snapshot output dir before execution
 	output_path = Path(output_dir)
 	output_path.mkdir(exist_ok=True)
-	before = set(output_path.iterdir())
+
+	def _signature_map() -> dict[Path, tuple[int, int]]:
+		return {
+			path: (path.stat().st_mtime_ns, path.stat().st_size)
+			for path in output_path.iterdir()
+			if path.is_file()
+		}
 
 	try:
+		before = _signature_map()
 		result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 		success = result.returncode == 0
 		output = result.stdout + result.stderr
 
-		# Detect newly created files
-		after = set(output_path.iterdir())
-		new_files = sorted(str(f) for f in after - before)
-		if new_files:
-			file_list = "\n".join(new_files)
+		output_files: list[str] = []
+		if success:
+			after = _signature_map()
+			output_files = sorted(
+				str(path)
+				for path, signature in after.items()
+				if before.get(path) != signature
+			)
+
+		if output_files:
+			file_list = "\n".join(output_files)
 			output += f"\n\nOutput files:\n{file_list}"
-			logger.info("Output files created", files=new_files)
+			logger.info("Output files created", files=output_files)
 
 		return ObservationResult(
-			tool="execute_code", success=success, output=output, data=new_files
+			tool="execute_code", success=success, output=output, data=output_files
 		)
 	except subprocess.TimeoutExpired:
 		return ObservationResult(
-			tool="execute_code", success=False, output="Script timed out after 120s"
+			tool="execute_code",
+			success=False,
+			output="Script timed out after 120s",
+			data=[],
 		)
 	except Exception as e:
-		return ObservationResult(tool="execute_code", success=False, output=str(e))
+		return ObservationResult(tool="execute_code", success=False, output=str(e), data=[])
 
 
 def tool_validate_output(

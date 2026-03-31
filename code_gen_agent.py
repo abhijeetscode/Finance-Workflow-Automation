@@ -63,9 +63,28 @@ You MUST end every run by calling either finish (success) or terminate (failure)
 
 
 class CodeGenAgent:
+	OUTPUT_PATTERNS = (
+		"Vendor Payment Processing Audit*.xlsx",
+		"Bill.com Vendor Payments*.csv",
+	)
+
 	def __init__(self):
 		self.client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 		self.model = os.getenv("LM_MODEL", "claude-haiku-4-5")
+
+	@classmethod
+	def _resolve_output_files(cls, output_dir: str = "./outputs") -> list[str]:
+		output_path = Path(output_dir)
+		if not output_path.exists():
+			return []
+
+		files: list[Path] = []
+		for pattern in cls.OUTPUT_PATTERNS:
+			matches = list(output_path.glob(pattern))
+			if matches:
+				files.append(max(matches, key=lambda path: path.stat().st_mtime_ns))
+
+		return [str(path) for path in sorted(files)]
 
 	def run(self, input_file_path: str, max_steps: int = 20) -> dict:
 		log = logger.bind(file=input_file_path)
@@ -164,6 +183,8 @@ class CodeGenAgent:
 								result += "\nMax retries reached (3). Consider terminating."
 
 						if fn_name == "finish":
+							if not output_files:
+								output_files = self._resolve_output_files()
 							log.info(
 								"agent_finished",
 								summary=result,

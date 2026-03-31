@@ -49,45 +49,45 @@ class PlanStep(BaseModel):
 
 
 class ExecutionPlan(BaseModel):
-	steps: list[PlanStep]
+	step: PlanStep
 	reasoning: str
 
 
 class StepEvaluation(BaseModel):
 	success: bool
-	next_step_context: str  # relevant output to pass into the next step's instructions
 	retry: bool
 	reasoning: str
 
 
 # ── Prompts ───────────────────────────────────────────────────────────────────
 
-PLANNER_SYSTEM = """You are the planning component of an orchestration system for financial workflows.
+PLANNER_SYSTEM = """You are a routing component of an orchestration system for financial workflows.
 
-Given a user objective and files, produce a minimal execution plan.
+Given a user objective and files, choose exactly one agent and produce exactly one execution step.
 
 Available agents:
-- codegen_agent: transforms Excel files (.xlsx) into a fixed audit output (4-sheet Excel + CSV)
-- sop_agent: executes a business process by following steps in an SOP document (.docx)
+	- codegen_agent: transforms Excel files (.xlsx) into a fixed audit output
+	- sop_agent: executes a business process by following steps in an SOP document
 
 Rules:
-- Each step assigns one or more files to one agent
-- Use only the files needed for that step, in the correct order
+- Return exactly one step
+- Choose one agent for the whole objective
+- Do not chain agents
+- Use only the files needed for that agent, in the correct order
 - codegen_agent should usually receive exactly one Excel input file
 - sop_agent may require an SOP document plus additional supporting files
-- Chain agents when the objective requires it (e.g. extract SOP steps → feed into codegen_agent)
-- Keep the plan as short as possible — only include what is needed
+- If the objective is SOP-driven, route to sop_agent
+- If the objective is vendor-payment audit transformation from an Excel file, route to codegen_agent
 """
 
 EVALUATOR_SYSTEM = """You are the evaluation component of an orchestration system for financial workflows.
 
-A sub-agent just completed a step. You must:
+A sub-agent just completed the only step. You must:
 1. Determine success from the output prefix:
    - Output starts with "SUCCESS:" → success = true
    - Output starts with "FAILURE:" → success = false
    - No prefix → infer from content (file paths present = success, exception/error = failure)
-2. If there is a next step, extract relevant context from this output to pass forward as instructions.
-3. Decide whether to retry on failure:
+2. Decide whether to retry on failure:
    - retry = false if the output explicitly says "do not retry"
    - retry = false if the agent already ran human interactions (it managed its own retries internally)
    - retry = true only for clearly transient failures (e.g. network timeout, unexpected exception)
@@ -133,6 +133,11 @@ def _build_success_message(total_steps: int, last_output: str) -> str:
 	)
 
 
+def _log_node_output(log, payload: dict) -> None:
+	preview = json.dumps(payload, default=str)[:2000]
+	log.info("node_output", payload=preview)
+
+
 def _render_run_result(result: dict) -> str:
 	status = result.get("status")
 	step_results = result.get("step_results", [])
@@ -171,14 +176,13 @@ async def planner_node(state: OrchestratorState) -> dict:
 		]
 	)
 
-	plan = [s.model_dump() for s in response.steps]
-	log.info("plan_created", steps=len(plan), reasoning=response.reasoning)
+	plan = [response.step.model_dump()]
+	log.info("plan_created", steps=1, reasoning=response.reasoning)
 
-	plan_summary = "\n".join(
-		f"  Step {i + 1}: {s['agent']} <- {', '.join(s['files'])}" for i, s in enumerate(plan)
-	)
+	step = plan[0]
+	plan_summary = f"  Step 1: {step['agent']} <- {', '.join(step['files'])}"
 
-	return {
+	result = {
 		"plan": plan,
 		"current_step": 0,
 		"step_results": [],
@@ -186,6 +190,8 @@ async def planner_node(state: OrchestratorState) -> dict:
 		"status": "executing",
 		"messages": [AIMessage(content=f"Plan ({len(plan)} step(s)):\n{plan_summary}")],
 	}
+	_log_node_output(log, result)
+	return result
 
 
 async def executor_node(state: OrchestratorState) -> dict:
@@ -226,12 +232,14 @@ async def executor_node(state: OrchestratorState) -> dict:
 	else:
 		step_results.append(entry)
 
-	return {
+	result = {
 		"step_results": step_results,
 		"messages": [
 			AIMessage(content=f"Step {step_idx + 1} ({step['agent']}) output:\n{str(output)[:400]}")
 		],
 	}
+	_log_node_output(log, result)
+	return result
 
 
 async def evaluator_node(state: OrchestratorState) -> dict:
@@ -243,10 +251,6 @@ async def evaluator_node(state: OrchestratorState) -> dict:
 	total_steps = len(plan)
 	last_result = state["step_results"][-1]
 
-	next_step_info = (
-		json.dumps(plan[current_step + 1]) if current_step + 1 < total_steps else "none"
-	)
-
 	llm = _llm().with_structured_output(StepEvaluation)
 	evaluation: StepEvaluation = await llm.ainvoke(  # type: ignore[assignment]
 		[
@@ -255,8 +259,7 @@ async def evaluator_node(state: OrchestratorState) -> dict:
 				content=(
 					f"Step {current_step + 1} of {total_steps}\n"
 					f"Agent: {last_result['agent']}\n"
-					f"Output:\n{last_result['output']}\n\n"
-					f"Next step: {next_step_info}"
+					f"Output:\n{last_result['output']}"
 				)
 			),
 		]
@@ -281,7 +284,7 @@ async def evaluator_node(state: OrchestratorState) -> dict:
 					"outcome": "success",
 				}
 			)
-			return {
+			result = {
 				"status": "done",
 				"messages": [
 					AIMessage(
@@ -289,32 +292,13 @@ async def evaluator_node(state: OrchestratorState) -> dict:
 					)
 				],
 			}
-
-		# Inject context from this step into the next step's instructions
-		updated_plan = list(plan)
-		if evaluation.next_step_context:
-			next_step = dict(updated_plan[current_step + 1])
-			next_step["instructions"] += (
-				f"\n\nContext from previous step:\n{evaluation.next_step_context}"
-			)
-			updated_plan[current_step + 1] = next_step
-			log.debug(
-				"context_forwarded",
-				to_step=current_step + 2,
-				context=evaluation.next_step_context[:100],
-			)
-
-		return {
-			"current_step": current_step + 1,
-			"retries": 0,
-			"plan": updated_plan,
-			"status": "executing",
-		}
+			_log_node_output(log, result)
+			return result
 
 	# Step failed
 	if retries < MAX_RETRIES and evaluation.retry:
 		log.warning("retrying_step", step=current_step + 1, attempt=retries + 1)
-		return {
+		result = {
 			"retries": retries + 1,
 			"messages": [
 				AIMessage(
@@ -322,6 +306,8 @@ async def evaluator_node(state: OrchestratorState) -> dict:
 				)
 			],
 		}
+		_log_node_output(log, result)
+		return result
 
 	log.error("step_failed", step=current_step + 1, reason=evaluation.reasoning)
 	await log_run.ainvoke(
@@ -332,7 +318,7 @@ async def evaluator_node(state: OrchestratorState) -> dict:
 			"outcome": "failure",
 		}
 	)
-	return {
+	result = {
 		"status": "failed",
 		"messages": [
 			AIMessage(
@@ -343,6 +329,8 @@ async def evaluator_node(state: OrchestratorState) -> dict:
 			)
 		],
 	}
+	_log_node_output(log, result)
+	return result
 
 
 def route_after_evaluator(state: OrchestratorState) -> str:

@@ -21,6 +21,7 @@ from tools import (
 	read_xml,
 	extract_html_tables_from_xml,
 	add_computed_columns,
+	aggregate_sheet,
 )
 
 logger = logging.getLogger(__name__)
@@ -157,6 +158,41 @@ def make_tools(step_number_ref: list[int]) -> list:
 			step_number_ref[0],
 		)
 
+	def aggregate_sheet_tool(
+		source_path: str,
+		source_sheet: str,
+		output_path: str,
+		output_sheet: str,
+		group_by_json: str,
+		agg_cols_json: str,
+		filter_col: str = "",
+		filter_value: str = "",
+	) -> str:
+		"""Aggregate (GROUP BY + SUM/COUNT) rows from any sheet and write the result to an output sheet.
+		Use this to create pivot-style summary tables — do NOT use add_computed_columns for aggregation.
+
+		group_by_json — JSON array of column names to group by, e.g. ["COUNTRY", "CURRENCYCODE"]
+		agg_cols_json — JSON array of {col, func} objects:
+		  [{"col": "USD Sales Amount", "func": "sum"},
+		   {"col": "USD Tax Amount",   "func": "sum"},
+		   {"col": "DOCUMENTID",       "func": "count"}]
+		  Supported funcs: "sum", "count"
+		filter_col/filter_value — optional: keep only rows where filter_col == filter_value
+
+		Column names must exactly match the header row of source_sheet (use read_excel_tool first to confirm).
+		Asks human for approval before writing."""
+		return aggregate_sheet(
+			source_path,
+			source_sheet,
+			output_path,
+			output_sheet,
+			group_by_json,
+			agg_cols_json,
+			step_number_ref[0],
+			filter_col,
+			filter_value,
+		)
+
 	return [
 		read_excel_tool,
 		list_sheets_tool,
@@ -167,6 +203,7 @@ def make_tools(step_number_ref: list[int]) -> list:
 		read_xml_tool,
 		extract_html_tables_tool,
 		add_computed_columns_tool,
+		aggregate_sheet_tool,
 	]
 
 

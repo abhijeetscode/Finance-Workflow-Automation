@@ -430,303 +430,465 @@ def copy_formula(
 
 
 def _load_lookup_table(wb, sheet_name: str, key_col: str, val_col: str) -> dict:
-    """Load a sheet into a {key: value} dict, skipping metadata rows at the top.
-    Header row is the first row with >= 2 non-empty cells."""
-    ws = wb[sheet_name]
-    headers: list = []
-    header_row_idx = -1
-    for i, row in enumerate(ws.iter_rows(max_row=20, values_only=True)):
-        non_empty = [v for v in row if v is not None and str(v).strip()]
-        if len(non_empty) >= 2:
-            headers = list(row)
-            header_row_idx = i + 1  # 1-based
-            break
-    if not headers:
-        return {}
+	"""Load a sheet into a {key: value} dict, skipping metadata rows at the top.
+	Header row is the first row with >= 2 non-empty cells."""
+	ws = wb[sheet_name]
+	headers: list = []
+	header_row_idx = -1
+	for i, row in enumerate(ws.iter_rows(max_row=20, values_only=True)):
+		non_empty = [v for v in row if v is not None and str(v).strip()]
+		if len(non_empty) >= 2:
+			headers = list(row)
+			header_row_idx = i + 1  # 1-based
+			break
+	if not headers:
+		return {}
 
-    def _idx(col_name: str) -> int:
-        for j, h in enumerate(headers):
-            if h is not None and str(h).strip() == col_name.strip():
-                return j
-        raise ValueError(f"Column '{col_name}' not found in sheet '{sheet_name}'. Headers: {headers}")
+	def _idx(col_name: str) -> int:
+		for j, h in enumerate(headers):
+			if h is not None and str(h).strip() == col_name.strip():
+				return j
+		raise ValueError(
+			f"Column '{col_name}' not found in sheet '{sheet_name}'. Headers: {headers}"
+		)
 
-    ki = _idx(key_col)
-    vi = _idx(val_col)
-    table = {}
-    for row in ws.iter_rows(min_row=header_row_idx + 1, values_only=True):
-        k = row[ki]
-        v = row[vi]
-        if k is not None:
-            table[str(k)] = v
-    return table
+	ki = _idx(key_col)
+	vi = _idx(val_col)
+	table = {}
+	for row in ws.iter_rows(min_row=header_row_idx + 1, values_only=True):
+		k = row[ki]
+		v = row[vi]
+		if k is not None:
+			table[str(k)] = v
+	return table
 
 
 def _format_date_value(val, fmt: str) -> str:
-    """Format a cell value (datetime, date, or string) using strftime fmt.
-    Supports '%-m' on Unix for month without leading zero."""
-    if val is None:
-        return ""
-    if isinstance(val, datetime):
-        dt = val
-    elif hasattr(val, "year"):  # date object
-        dt = datetime(val.year, val.month, val.day)
-    else:
-        s = str(val).strip()
-        for pat in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d", "%m/%d/%Y", "%m-%d-%Y"):
-            try:
-                dt = datetime.strptime(s, pat)
-                break
-            except ValueError:
-                continue
-        else:
-            return s  # can't parse — return as-is
-    try:
-        return dt.strftime(fmt)
-    except ValueError:
-        # Windows doesn't support %-m; fall back to manual stripping
-        result = dt.strftime(fmt.replace("%-m", "%m").replace("%-d", "%d"))
-        result = re.sub(r"\b0(\d)", r"\1", result)  # strip leading zeros
-        return result
+	"""Format a cell value (datetime, date, or string) using strftime fmt.
+	Supports '%-m' on Unix for month without leading zero."""
+	if val is None:
+		return ""
+	if isinstance(val, datetime):
+		dt = val
+	elif hasattr(val, "year"):  # date object
+		dt = datetime(val.year, val.month, val.day)
+	else:
+		s = str(val).strip()
+		for pat in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d", "%m/%d/%Y", "%m-%d-%Y"):
+			try:
+				dt = datetime.strptime(s, pat)
+				break
+			except ValueError:
+				continue
+		else:
+			return s  # can't parse — return as-is
+	try:
+		return dt.strftime(fmt)
+	except ValueError:
+		# Windows doesn't support %-m; fall back to manual stripping
+		result = dt.strftime(fmt.replace("%-m", "%m").replace("%-d", "%d"))
+		result = re.sub(r"\b0(\d)", r"\1", result)  # strip leading zeros
+		return result
 
 
 def _read_src_headers_and_sample(
-    source_path: str, source_sheet: str, n: int = 5
+	source_path: str, source_sheet: str, n: int = 5
 ) -> tuple[list, list]:
-    """Return (headers, sample_rows) reading only the first n data rows — fast for large files."""
-    src_p = Path(source_path)
-    if src_p.suffix.lower() in (".xls", ".xml") or _is_spreadsheetml(source_path):
-        raw_rows = _read_spreadsheetml_sheet(source_path, source_sheet)
-        if not raw_rows:
-            return [], []
-        headers = [str(h) if h else f"col_{i}" for i, h in enumerate(raw_rows[0])]
-        sample = []
-        for row in raw_rows[1: n + 1]:
-            padded = (row + [""] * len(headers))[: len(headers)]
-            if any(v not in ("", None) for v in padded):
-                sample.append(list(padded))
-    else:
-        wb = openpyxl.load_workbook(source_path, data_only=True, read_only=True)
-        ws = wb[source_sheet]
-        raw = []
-        for i, row in enumerate(ws.iter_rows(values_only=True)):
-            raw.append(row)
-            if i > n:
-                break
-        wb.close()
-        if not raw:
-            return [], []
-        headers = [str(h) if h is not None else f"col_{i}" for i, h in enumerate(raw[0])]
-        sample = [list(r) for r in raw[1: n + 1] if any(v is not None for v in r)]
-    return headers, sample
+	"""Return (headers, sample_rows) reading only the first n data rows — fast for large files."""
+	src_p = Path(source_path)
+	if src_p.suffix.lower() in (".xls", ".xml") or _is_spreadsheetml(source_path):
+		raw_rows = _read_spreadsheetml_sheet(source_path, source_sheet)
+		if not raw_rows:
+			return [], []
+		headers = [str(h) if h else f"col_{i}" for i, h in enumerate(raw_rows[0])]
+		sample = []
+		for row in raw_rows[1 : n + 1]:
+			padded = (row + [""] * len(headers))[: len(headers)]
+			if any(v not in ("", None) for v in padded):
+				sample.append(list(padded))
+	else:
+		wb = openpyxl.load_workbook(source_path, data_only=True, read_only=True)
+		ws = wb[source_sheet]
+		raw = []
+		for i, row in enumerate(ws.iter_rows(values_only=True)):
+			raw.append(row)
+			if i > n:
+				break
+		wb.close()
+		if not raw:
+			return [], []
+		headers = [str(h) if h is not None else f"col_{i}" for i, h in enumerate(raw[0])]
+		sample = [list(r) for r in raw[1 : n + 1] if any(v is not None for v in r)]
+	return headers, sample
 
 
-def _read_all_src_data(
-    source_path: str, source_sheet: str, src_headers: list
-) -> list:
-    """Read all data rows from source (already know headers)."""
-    src_p = Path(source_path)
-    if src_p.suffix.lower() in (".xls", ".xml") or _is_spreadsheetml(source_path):
-        raw_rows = _read_spreadsheetml_sheet(source_path, source_sheet)
-        result = []
-        for row in raw_rows[1:]:
-            padded = (row + [""] * len(src_headers))[: len(src_headers)]
-            if any(v not in ("", None) for v in padded):
-                result.append(list(padded))
-        return result
-    else:
-        wb = openpyxl.load_workbook(source_path, data_only=True, read_only=True)
-        ws = wb[source_sheet]
-        raw = list(ws.iter_rows(values_only=True))
-        wb.close()
-        return [list(r) for r in raw[1:] if any(v is not None for v in r)]
+def _read_all_src_data(source_path: str, source_sheet: str, src_headers: list) -> list:
+	"""Read all data rows from source (already know headers)."""
+	src_p = Path(source_path)
+	if src_p.suffix.lower() in (".xls", ".xml") or _is_spreadsheetml(source_path):
+		raw_rows = _read_spreadsheetml_sheet(source_path, source_sheet)
+		result = []
+		for row in raw_rows[1:]:
+			padded = (row + [""] * len(src_headers))[: len(src_headers)]
+			if any(v not in ("", None) for v in padded):
+				result.append(list(padded))
+		return result
+	else:
+		wb = openpyxl.load_workbook(source_path, data_only=True, read_only=True)
+		ws = wb[source_sheet]
+		raw = list(ws.iter_rows(values_only=True))
+		wb.close()
+		return [list(r) for r in raw[1:] if any(v is not None for v in r)]
 
 
 def add_computed_columns(
-    output_path: str,
-    output_sheet: str,
-    columns_json: str,
-    source_path: str = "",
-    source_sheet: str = "",
-    step_number: int = 0,
+	output_path: str,
+	output_sheet: str,
+	columns_json: str,
+	source_path: str = "",
+	source_sheet: str = "",
+	step_number: int = 0,
 ) -> str:
-    """Add computed columns to an output sheet entirely in Python (no LLM row processing).
+	"""Add computed columns to an output sheet entirely in Python (no LLM row processing).
 
-    If source_path + source_sheet are provided, reads base data from that file and writes
-    everything (original columns + new columns) into output_sheet — use this when the
-    output sheet is empty or needs to be populated from an input file.
-    Otherwise, reads existing rows from output_sheet and appends new columns in-place.
+	If source_path + source_sheet are provided, reads base data from that file and writes
+	everything (original columns + new columns) into output_sheet — use this when the
+	output sheet is empty or needs to be populated from an input file.
+	Otherwise, reads existing rows from output_sheet and appends new columns in-place.
 
-    columns_json — JSON array of column specs:
-      {"name": "col_name", "expr": "<type>", "args": {...}}
+	columns_json — JSON array of column specs:
+	  {"name": "col_name", "expr": "<type>", "args": {...}}
 
-    Supported expr types:
-      "concat"       — join fields; args: {fields, sep, date_cols: {col: strftime_fmt}}
-      "vlookup"      — args: {key_col, lookup_sheet, lookup_key_col, lookup_value_col, default}
-      "multiply"     — args: {col_a, col_b}
-      "flag_equals"  — args: {col, value}   → "YES"/"NO"
-      "flag_empty"   — args: {col}          → "YES"/"NO"
+	Supported expr types:
+	  "concat"       — join fields; args: {fields, sep, date_cols: {col: strftime_fmt}}
+	  "vlookup"      — args: {key_col, lookup_sheet, lookup_key_col, lookup_value_col, default}
+	  "multiply"     — args: {col_a, col_b}
+	  "flag_equals"  — args: {col, value}   → "YES"/"NO"
+	  "flag_empty"   — args: {col}          → "YES"/"NO"
 
-    vlookup sheets must exist in the output file.
-    Asks human for approval (using a small sample) BEFORE reading all rows."""
-    _assert_output_path(output_path)
+	vlookup sheets must exist in the output file.
+	Asks human for approval (using a small sample) BEFORE reading all rows."""
+	_assert_output_path(output_path)
 
-    column_specs: list[dict] = json.loads(columns_json)
-    new_col_names = [s["name"] for s in column_specs]
-    reading_from_source = bool(source_path and source_sheet)
+	column_specs: list[dict] = json.loads(columns_json)
+	new_col_names = [s["name"] for s in column_specs]
+	reading_from_source = bool(source_path and source_sheet)
 
-    # --- Step 1: read headers + small sample only (fast) ---
-    if reading_from_source:
-        src_headers, sample_rows = _read_src_headers_and_sample(source_path, source_sheet)
-        if not src_headers:
-            return f"Source sheet '{source_sheet}' in {source_path} is empty."
-        # Get total row count cheaply
-        wb_tmp = openpyxl.load_workbook(source_path, data_only=True, read_only=True)
-        total_rows = wb_tmp[source_sheet].max_row - 1
-        wb_tmp.close()
-    else:
-        wb_tmp = openpyxl.load_workbook(output_path, data_only=True, read_only=True)
-        ws_tmp = wb_tmp[output_sheet]
-        raw_tmp = list(ws_tmp.iter_rows(max_row=6, values_only=True))
-        total_rows = ws_tmp.max_row - 1
-        wb_tmp.close()
-        if not raw_tmp:
-            return f"Output sheet '{output_sheet}' is empty. Pass source_path/source_sheet to populate it first."
-        src_headers = [str(h) if h is not None else f"col_{i}" for i, h in enumerate(raw_tmp[0])]
-        sample_rows = [list(r) for r in raw_tmp[1:] if any(v is not None for v in r)]
+	# --- Step 1: read headers + small sample only (fast) ---
+	if reading_from_source:
+		src_headers, sample_rows = _read_src_headers_and_sample(source_path, source_sheet)
+		if not src_headers:
+			return f"Source sheet '{source_sheet}' in {source_path} is empty."
+		# Get total row count cheaply
+		wb_tmp = openpyxl.load_workbook(source_path, data_only=True, read_only=True)
+		total_rows = wb_tmp[source_sheet].max_row - 1
+		wb_tmp.close()
+	else:
+		wb_tmp = openpyxl.load_workbook(output_path, data_only=True, read_only=True)
+		ws_tmp = wb_tmp[output_sheet]
+		raw_tmp = list(ws_tmp.iter_rows(max_row=6, values_only=True))
+		total_rows = ws_tmp.max_row - 1
+		wb_tmp.close()
+		if not raw_tmp:
+			return f"Output sheet '{output_sheet}' is empty. Pass source_path/source_sheet to populate it first."
+		src_headers = [str(h) if h is not None else f"col_{i}" for i, h in enumerate(raw_tmp[0])]
+		sample_rows = [list(r) for r in raw_tmp[1:] if any(v is not None for v in r)]
 
-    # --- Step 2: load lookups (small reference sheets — fast) ---
-    out_wb_read = openpyxl.load_workbook(output_path, data_only=True, read_only=True)
-    lookups: dict[tuple, dict] = {}
-    for spec in column_specs:
-        if spec["expr"] == "vlookup":
-            a = spec["args"]
-            key = (a["lookup_sheet"], a["lookup_key_col"], a["lookup_value_col"])
-            if key not in lookups:
-                lookups[key] = _load_lookup_table(out_wb_read, *key)
-                logger.debug("Loaded lookup '%s': %d entries", a["lookup_sheet"], len(lookups[key]))
-    out_wb_read.close()
+	# --- Step 2: load lookups (small reference sheets — fast) ---
+	out_wb_read = openpyxl.load_workbook(output_path, data_only=True, read_only=True)
+	lookups: dict[tuple, dict] = {}
+	for spec in column_specs:
+		if spec["expr"] == "vlookup":
+			a = spec["args"]
+			key = (a["lookup_sheet"], a["lookup_key_col"], a["lookup_value_col"])
+			if key not in lookups:
+				lookups[key] = _load_lookup_table(out_wb_read, *key)
+				logger.debug("Loaded lookup '%s': %d entries", a["lookup_sheet"], len(lookups[key]))
+	out_wb_read.close()
 
-    def compute_row(row_vals: dict) -> list:
-        computed: dict = {}
-        for spec in column_specs:
-            name = spec["name"]
-            expr = spec["expr"]
-            args = spec["args"]
+	def compute_row(row_vals: dict) -> list:
+		computed: dict = {}
+		for spec in column_specs:
+			name = spec["name"]
+			expr = spec["expr"]
+			args = spec["args"]
 
-            if expr == "concat":
-                parts = []
-                for field in args["fields"]:
-                    val = computed.get(field, row_vals.get(field))
-                    date_fmt = args.get("date_cols", {}).get(field)
-                    if date_fmt:
-                        val = _format_date_value(val, date_fmt)
-                    else:
-                        val = "" if val is None else str(val)
-                    parts.append(val)
-                result = args.get("sep", "-").join(parts)
+			if expr == "concat":
+				parts = []
+				for field in args["fields"]:
+					val = computed.get(field, row_vals.get(field))
+					date_fmt = args.get("date_cols", {}).get(field)
+					if date_fmt:
+						val = _format_date_value(val, date_fmt)
+					else:
+						val = "" if val is None else str(val)
+					parts.append(val)
+				result = args.get("sep", "-").join(parts)
 
-            elif expr == "vlookup":
-                key_val = computed.get(args["key_col"], row_vals.get(args["key_col"]))
-                lk_key = (args["lookup_sheet"], args["lookup_key_col"], args["lookup_value_col"])
-                result = lookups[lk_key].get(
-                    str(key_val) if key_val is not None else "", args.get("default", "")
-                )
+			elif expr == "vlookup":
+				key_val = computed.get(args["key_col"], row_vals.get(args["key_col"]))
+				lk_key = (args["lookup_sheet"], args["lookup_key_col"], args["lookup_value_col"])
+				result = lookups[lk_key].get(
+					str(key_val) if key_val is not None else "", args.get("default", "")
+				)
 
-            elif expr == "multiply":
-                a_val = computed.get(args["col_a"], row_vals.get(args["col_a"]))
-                b_val = computed.get(args["col_b"], row_vals.get(args["col_b"]))
-                try:
-                    result = float(a_val or 0) * float(b_val or 0)
-                except (ValueError, TypeError):
-                    result = ""
+			elif expr == "multiply":
+				a_val = computed.get(args["col_a"], row_vals.get(args["col_a"]))
+				b_val = computed.get(args["col_b"], row_vals.get(args["col_b"]))
+				try:
+					result = float(a_val or 0) * float(b_val or 0)
+				except (ValueError, TypeError):
+					result = ""
 
-            elif expr == "flag_equals":
-                val = computed.get(args["col"], row_vals.get(args["col"]))
-                result = "YES" if str(val or "").strip().upper() == str(args["value"]).upper() else "NO"
+			elif expr == "flag_equals":
+				val = computed.get(args["col"], row_vals.get(args["col"]))
+				result = (
+					"YES" if str(val or "").strip().upper() == str(args["value"]).upper() else "NO"
+				)
 
-            elif expr == "flag_empty":
-                val = computed.get(args["col"], row_vals.get(args["col"]))
-                result = "YES" if (
-                    val is None or str(val).strip() == "" or val == args.get("default", "")
-                ) else "NO"
+			elif expr == "flag_empty":
+				val = computed.get(args["col"], row_vals.get(args["col"]))
+				result = (
+					"YES"
+					if (val is None or str(val).strip() == "" or val == args.get("default", ""))
+					else "NO"
+				)
 
-            else:
-                result = f"Unknown expr: {expr}"
+			else:
+				result = f"Unknown expr: {expr}"
 
-            computed[name] = result
-        return [computed[n] for n in new_col_names]
+			computed[name] = result
+		return [computed[n] for n in new_col_names]
 
-    # --- Step 3: preview using sample rows only, then ask approval ---
-    sample_new_values = []
-    for raw_row in sample_rows[:3]:
-        padded = (raw_row + [None] * len(src_headers))[: len(src_headers)]
-        sample_new_values.append(compute_row(dict(zip(src_headers, padded))))
+	# --- Step 3: preview using sample rows only, then ask approval ---
+	sample_new_values = []
+	for raw_row in sample_rows[:3]:
+		padded = (raw_row + [None] * len(src_headers))[: len(src_headers)]
+		sample_new_values.append(compute_row(dict(zip(src_headers, padded))))
 
-    preview_lines = [
-        f"add_computed_columns: {output_sheet} | {total_rows} rows | "
-        f"{'from ' + source_sheet if reading_from_source else 'in-place'}",
-        f"New columns: {new_col_names}",
-        "Sample (first 3 rows):",
-    ]
-    for i, new_vals in enumerate(sample_new_values):
-        preview_lines.append(f"  Row {i + 2}: {dict(zip(new_col_names, new_vals))}")
+	preview_lines = [
+		f"add_computed_columns: {output_sheet} | {total_rows} rows | "
+		f"{'from ' + source_sheet if reading_from_source else 'in-place'}",
+		f"New columns: {new_col_names}",
+		"Sample (first 3 rows):",
+	]
+	for i, new_vals in enumerate(sample_new_values):
+		preview_lines.append(f"  Row {i + 2}: {dict(zip(new_col_names, new_vals))}")
 
-    status, feedback = verify_before_write(step_number, "\n".join(preview_lines))
-    if status == "retry":
-        return f"add_computed_columns cancelled. Human feedback: {feedback}"
+	status, feedback = verify_before_write(step_number, "\n".join(preview_lines))
+	if status == "retry":
+		return f"add_computed_columns cancelled. Human feedback: {feedback}"
 
-    # --- Step 4: read ALL rows and compute (only runs after approval) ---
-    if reading_from_source:
-        logger.info(
-            "add_computed_columns: reading %d rows from %s[%s]",
-            total_rows, source_path, source_sheet,
-        )
-        src_data = _read_all_src_data(source_path, source_sheet, src_headers)
-    else:
-        logger.info(
-            "add_computed_columns: reading %d rows from output sheet %s",
-            total_rows, output_sheet,
-        )
-        wb_full = openpyxl.load_workbook(output_path, data_only=True, read_only=True)
-        raw_full = list(wb_full[output_sheet].iter_rows(values_only=True))
-        wb_full.close()
-        src_data = [list(r) for r in raw_full[1:] if any(v is not None for v in r)]
+	# --- Step 4: read ALL rows and compute (only runs after approval) ---
+	if reading_from_source:
+		logger.info(
+			"add_computed_columns: reading %d rows from %s[%s]",
+			total_rows,
+			source_path,
+			source_sheet,
+		)
+		src_data = _read_all_src_data(source_path, source_sheet, src_headers)
+	else:
+		logger.info(
+			"add_computed_columns: reading %d rows from output sheet %s",
+			total_rows,
+			output_sheet,
+		)
+		wb_full = openpyxl.load_workbook(output_path, data_only=True, read_only=True)
+		raw_full = list(wb_full[output_sheet].iter_rows(values_only=True))
+		wb_full.close()
+		src_data = [list(r) for r in raw_full[1:] if any(v is not None for v in r)]
 
-    all_new_values: list[list] = []
-    for raw_row in src_data:
-        padded = (raw_row + [None] * len(src_headers))[: len(src_headers)]
-        all_new_values.append(compute_row(dict(zip(src_headers, padded))))
+	all_new_values: list[list] = []
+	for raw_row in src_data:
+		padded = (raw_row + [None] * len(src_headers))[: len(src_headers)]
+		all_new_values.append(compute_row(dict(zip(src_headers, padded))))
 
-    # --- Step 5: write ---
-    out_wb = openpyxl.load_workbook(output_path)
-    out_ws = out_wb[output_sheet]
+	# --- Step 5: write ---
+	out_wb = openpyxl.load_workbook(output_path)
+	out_ws = out_wb[output_sheet]
 
-    if reading_from_source:
-        all_headers = src_headers + new_col_names
-        for ci, h in enumerate(all_headers, start=1):
-            out_ws.cell(row=1, column=ci, value=h)
-        for ri, (raw_row, new_vals) in enumerate(zip(src_data, all_new_values), start=2):
-            padded = (raw_row + [None] * len(src_headers))[: len(src_headers)]
-            for ci, v in enumerate(padded + new_vals, start=1):
-                out_ws.cell(row=ri, column=ci, value=v)
-    else:
-        next_col = out_ws.max_column + 1
-        for ci, h in enumerate(new_col_names, start=next_col):
-            out_ws.cell(row=1, column=ci, value=h)
-        for ri, new_vals in enumerate(all_new_values, start=2):
-            for ci, v in enumerate(new_vals, start=next_col):
-                out_ws.cell(row=ri, column=ci, value=v)
+	if reading_from_source:
+		all_headers = src_headers + new_col_names
+		for ci, h in enumerate(all_headers, start=1):
+			out_ws.cell(row=1, column=ci, value=h)
+		for ri, (raw_row, new_vals) in enumerate(zip(src_data, all_new_values), start=2):
+			padded = (raw_row + [None] * len(src_headers))[: len(src_headers)]
+			for ci, v in enumerate(padded + new_vals, start=1):
+				out_ws.cell(row=ri, column=ci, value=v)
+	else:
+		next_col = out_ws.max_column + 1
+		for ci, h in enumerate(new_col_names, start=next_col):
+			out_ws.cell(row=1, column=ci, value=h)
+		for ri, new_vals in enumerate(all_new_values, start=2):
+			for ci, v in enumerate(new_vals, start=next_col):
+				out_ws.cell(row=ri, column=ci, value=v)
 
-    out_wb.save(output_path)
-    out_wb.close()
-    logger.info(
-        "add_computed_columns: wrote %d rows, %d new cols to %s[%s]",
-        len(src_data), len(new_col_names), output_path, output_sheet,
-    )
-    return (
-        f"Added {len(new_col_names)} computed columns to '{output_sheet}': {new_col_names}. "
-        f"Rows written: {len(src_data)}."
-    )
+	out_wb.save(output_path)
+	out_wb.close()
+	logger.info(
+		"add_computed_columns: wrote %d rows, %d new cols to %s[%s]",
+		len(src_data),
+		len(new_col_names),
+		output_path,
+		output_sheet,
+	)
+	return (
+		f"Added {len(new_col_names)} computed columns to '{output_sheet}': {new_col_names}. "
+		f"Rows written: {len(src_data)}."
+	)
+
+
+# ---------------------------------------------------------------------------
+# Aggregation / pivot
+# ---------------------------------------------------------------------------
+
+
+def aggregate_sheet(
+	source_path: str,
+	source_sheet: str,
+	output_path: str,
+	output_sheet: str,
+	group_by_json: str,
+	agg_cols_json: str,
+	step_number: int = 0,
+	filter_col: str = "",
+	filter_value: str = "",
+) -> str:
+	"""Group rows from source_sheet by key columns and write aggregated totals to output_sheet.
+
+	group_by_json  — JSON array of column names to group by, e.g. ["COUNTRY", "CURRENCYCODE"]
+	agg_cols_json  — JSON array of {col, func} dicts, e.g.:
+	                 [{"col": "USD Sales Amount", "func": "sum"},
+	                  {"col": "USD Tax Amount",   "func": "sum"},
+	                  {"col": "DOCUMENTID",       "func": "count"}]
+	                 Supported funcs: "sum", "count"
+	filter_col     — optional column name to pre-filter rows before aggregating
+	filter_value   — keep only rows where filter_col == filter_value (case-insensitive)
+
+	Reads source from source_path (any readable file).
+	Writes result to output_path (must be inside fyra/output/).
+	Asks human for approval before writing."""
+	_assert_output_path(output_path)
+
+	group_by: list[str] = json.loads(group_by_json)
+	agg_cols: list[dict] = json.loads(agg_cols_json)
+
+	# --- read source ---
+	src_p = Path(source_path)
+	if src_p.suffix.lower() in (".xls", ".xml") or _is_spreadsheetml(source_path):
+		raw_rows = _read_spreadsheetml_sheet(source_path, source_sheet)
+		if not raw_rows:
+			return f"Source sheet '{source_sheet}' is empty."
+		src_headers = [str(h) if h else f"col_{i}" for i, h in enumerate(raw_rows[0])]
+		data_rows = [list(r) for r in raw_rows[1:]]
+	else:
+		wb = openpyxl.load_workbook(source_path, data_only=True, read_only=True)
+		ws = wb[source_sheet]
+		raw = list(ws.iter_rows(values_only=True))
+		wb.close()
+		if not raw:
+			return f"Source sheet '{source_sheet}' is empty."
+		src_headers = [str(h) if h is not None else f"col_{i}" for i, h in enumerate(raw[0])]
+		data_rows = [list(r) for r in raw[1:]]
+
+	# validate columns exist
+	missing = [c for c in group_by if c not in src_headers]
+	missing += [a["col"] for a in agg_cols if a["col"] not in src_headers]
+	if missing:
+		return (
+			f"Columns not found in '{source_sheet}': {missing}. "
+			f"Available: {src_headers}"
+		)
+
+	gi = [src_headers.index(c) for c in group_by]
+	ai = [(src_headers.index(a["col"]), a["func"]) for a in agg_cols]
+	fi = src_headers.index(filter_col) if filter_col and filter_col in src_headers else -1
+
+	# --- aggregate ---
+	buckets: dict[tuple, list] = {}
+	key_order: list[tuple] = []
+
+	for row in data_rows:
+		if len(row) < len(src_headers):
+			row += [None] * (len(src_headers) - len(row))
+
+		if fi >= 0 and filter_value:
+			if str(row[fi] or "").strip().lower() != filter_value.lower():
+				continue
+
+		key = tuple(str(row[i] or "") for i in gi)
+		if key not in buckets:
+			buckets[key] = [0] * len(ai)
+			key_order.append(key)
+
+		for slot, (idx, func) in enumerate(ai):
+			raw_val = row[idx]
+			if func == "sum":
+				try:
+					buckets[key][slot] += float(raw_val or 0)
+				except (ValueError, TypeError):
+					pass
+			elif func == "count":
+				if raw_val is not None and str(raw_val).strip() != "":
+					buckets[key][slot] += 1
+
+	total_groups = len(key_order)
+	if total_groups == 0:
+		msg = f"No rows matched"
+		if filter_col:
+			msg += f" filter {filter_col}={filter_value!r}"
+		return msg + f" in '{source_sheet}'."
+
+	out_headers = group_by + [a["col"] for a in agg_cols]
+
+	# --- preview ---
+	preview_lines = [
+		f"aggregate_sheet: {source_sheet} → {output_sheet} | "
+		f"{total_groups} groups from {len(data_rows)} source rows",
+		f"Group by: {group_by}",
+		"Aggregations: " + str([f"{a['col']} ({a['func']})" for a in agg_cols]),
+	]
+	if filter_col:
+		preview_lines.append(f"Filter: {filter_col} = {filter_value!r}")
+	preview_lines.append("Sample (first 5 groups):")
+	for key in key_order[:5]:
+		vals = [round(v, 6) for v in buckets[key]]
+		preview_lines.append(f"  {dict(zip(out_headers, list(key) + vals))}")
+
+	status, feedback = verify_before_write(step_number, "\n".join(preview_lines))
+	if status == "retry":
+		return f"aggregate_sheet cancelled. Human feedback: {feedback}"
+
+	# --- write ---
+	out_wb = openpyxl.load_workbook(output_path)
+	if output_sheet not in out_wb.sheetnames:
+		out_wb.create_sheet(output_sheet)
+	out_ws = out_wb[output_sheet]
+
+	# clear any existing content
+	for row in out_ws.iter_rows():
+		for cell in row:
+			cell.value = None
+
+	for ci, h in enumerate(out_headers, start=1):
+		out_ws.cell(row=1, column=ci, value=h)
+
+	for ri, key in enumerate(key_order, start=2):
+		row_out = list(key) + buckets[key]
+		for ci, v in enumerate(row_out, start=1):
+			out_ws.cell(row=ri, column=ci, value=v)
+
+	out_wb.save(output_path)
+	out_wb.close()
+	logger.info(
+		"aggregate_sheet: %d groups written to %s[%s]",
+		total_groups, output_path, output_sheet,
+	)
+	return (
+		f"Wrote {total_groups} aggregated rows to '{output_sheet}'. "
+		f"Columns: {out_headers}."
+	)
 
 
 # ---------------------------------------------------------------------------

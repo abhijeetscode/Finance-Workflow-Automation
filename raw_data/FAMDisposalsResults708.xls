@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+<Author>NetSuite</Author>
+<LastAuthor>NetSuite</LastAuthor>
+<Company>NetSuite</Company>
+</DocumentProperties>
+<Styles>
+<Style ss:ID="company">
+<Alignment ss:Horizontal="Center"/>
+<Font ss:Bold="1"/>
+</Style> <Style ss:ID="error">
+<Alignment ss:Horizontal="Center"/>
+<Interior ss:Color="#d04040" ss:Pattern="Solid"/>
+<Font ss:Bold="1"/>
+</Style> <Style ss:ID="header">
+<Alignment ss:Horizontal="Center"/>
+<Font ss:Size="7" ss:Bold="1"/>
+<Interior ss:Color="#d0d0d0" ss:Pattern="Solid"/>
+</Style> <Style ss:ID="Default" ss:Name="Normal">
+<Alignment ss:Vertical="Bottom"/>
+<Borders/>
+<Font ss:FontName="Arial" ss:Size="8"/>
+<Interior/>
+<NumberFormat/>
+<Protection/>
+</Style>
+<Style ss:ID="s__TIMEOFDAY"><NumberFormat ss:Format="Medium Time"/></Style>
+<Style ss:ID="s__DATETIME"><NumberFormat ss:Format="General Date"/></Style>
+<Style ss:ID="s__DATETIMETZ"><NumberFormat ss:Format="General Date"/></Style>
+<Style ss:ID="s__DATE"><NumberFormat ss:Format="Short Date"/>
+</Style><Style ss:ID="s__text"></Style><Style ss:ID="s__currency"><NumberFormat ss:Format="Currency"/></Style>
+<Style ss:ID="s__percent"><NumberFormat ss:Format="Percent"/></Style>
+<Style ss:ID="s1_b_text"><Alignment ss:Indent="1"/><Font ss:FontName="Verdana" x:Family="Swiss" ss:Size="8" ss:Color="#000000" ss:Bold="1"/></Style>
+<Style ss:ID="s_b_text"><Font ss:FontName="Verdana" x:Family="Swiss" ss:Size="8" ss:Color="#000000" ss:Bold="1"/></Style>
+<Style ss:ID="s2__text"><Alignment ss:Indent="2"/></Style>
+<Style ss:ID="s_b_currency"><Font ss:FontName="Verdana" x:Family="Swiss" ss:Size="8" ss:Color="#000000" ss:Bold="1"/><NumberFormat ss:Format="Currency"/></Style>
+<Style ss:ID="s_currency_nosymbol"><Font ss:FontName="Verdana" x:Family="Swiss" ss:Size="8" ss:Color="#000000" /><NumberFormat ss:Format="#,##0.00_);[Red]\(#,##0.00\)"/></Style>
+<Style ss:ID="s1__text"><Alignment ss:Indent="1"/></Style>
+<Style ss:ID="s_b_currency_X"><Font ss:FontName="Verdana" x:Family="Swiss" ss:Size="8" ss:Color="#000000" ss:Bold="1"/><Interior ss:Color="#f0e0e0" ss:Pattern="Solid"/><NumberFormat ss:Format="Currency"/></Style>
+<Style ss:ID="s__currency_es_CO"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;Col$&quot;#,##0.00_);(&quot;Col$&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_ko_KR"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;KRW&quot;#,##0.00_);(&quot;KRW&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_ru_RU"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;RUB&quot;#,##0.00_);(&quot;RUB&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_zh_HK"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;HK$&quot;#,##0.00_);(&quot;HK$&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_en_US"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;$&quot;#,##0.00_);(&quot;$&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_ja_JP"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;¥&quot;#,##0.00_);(&quot;¥&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_tr_TR"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;TRY&quot;#,##0.00_);(&quot;TRY&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_en_AU"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;$A&quot;#,##0.00_);(&quot;$A&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_en_IN"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;0#Rs.|1#Re.|1<Rs.&quot;#,##0.00_);(&quot;0#Rs.|1#Re.|1<Rs.&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_cs_CZ"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;CZK&quot;#,##0.00_);(&quot;CZK&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_es_MX"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;MEX$&quot;#,##0.00_);(&quot;MEX$&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_no_NO"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;NKr&quot;#,##0.00_);(&quot;NKr&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_sv_SE"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;SKr&quot;#,##0.00_);(&quot;SKr&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_fr_CH"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;SwF&quot;#,##0.00_);(&quot;SwF&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_en_CA"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;Can$&quot;#,##0.00_);(&quot;Can$&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_pl_PL"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;Zl&quot;#,##0.00_);(&quot;Zl&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_af_ZA"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;R&quot;#,##0.00_);(&quot;R&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_id_ID"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;Rp&quot;#,##0.00_);(&quot;Rp&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_es_AR"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;Arg$&quot;#,##0.00_);(&quot;Arg$&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_da_DK"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;DKr&quot;#,##0.00_);(&quot;DKr&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_hu_HU"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;Ft&quot;#,##0.00_);(&quot;Ft&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_pt_BR"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;R$&quot;#,##0.00_);(&quot;R$&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_zh_CN"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;Y&quot;#,##0.00_);(&quot;Y&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_zh_TW"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;NT$&quot;#,##0.00_);(&quot;NT$&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_en_NZ"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;$NZ&quot;#,##0.00_);(&quot;$NZ&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_en_SG"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;S$&quot;#,##0.00_);(&quot;S$&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_en_GB"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;£&quot;#,##0.00_);(&quot;£&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_fr_FR_EURO"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;€&quot;#,##0.00_);(&quot;€&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_he_IL"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;ILS&quot;#,##0.00_);(&quot;ILS&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_en_PH"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;PHP&quot;#,##0.00_);(&quot;PHP&quot;#,##0.00)"/></Style>
+<Style ss:ID="s__currency_vi_VN"><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><NumberFormat ss:Format="&quot;VND&quot;#,##0.00_);(&quot;VND&quot;#,##0.00)"/></Style>
+</Styles>
+<Worksheet ss:Name="FAMDisposalsResults">
+<Table><Row>
+<Cell ss:StyleID="header"><Data ss:Type="String">Asset</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Name</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Status</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Type</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">OC</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Disposal Date</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Disposal Item</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Disposal Type</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Customer</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Amount</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Invoice #</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Quantity</Data></Cell>
+<Cell ss:StyleID="header"><Data ss:Type="String">Quantity Disposed</Data></Cell>
+</Row>
+<Row><Cell ss:StyleID="s__text"><Data ss:Type="String">FAM000285</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">MBP 13.3 SG/2.0GHZ QC/16GB/512GB-USA Web Order Number : 1015030876</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Disposed</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Electronic Devices</Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number">1765.02</Data></Cell>
+<Cell ss:StyleID="s__DATE"><Data ss:Type="DateTime">2026-02-01T00:00:00</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Write-off</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">0</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">1</Data></Cell>
+</Row>
+<Row><Cell ss:StyleID="s__text"><Data ss:Type="String">FAM048507</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">APPLE MBA 13 M3 8C10C 16GB 512GB MN-Handling Charges-Taxation-Serial No: L09WG4XG62</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Disposed</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Electronic Devices</Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number">1588.00</Data></Cell>
+<Cell ss:StyleID="s__DATE"><Data ss:Type="DateTime">2026-02-28T00:00:00</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Write-off</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">0</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">1</Data></Cell>
+</Row>
+<Row><Cell ss:StyleID="s__text"><Data ss:Type="String">FAM048565</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">APPLE MBP 16 M3P 12C18C 18 512GB SB- Serial No: KQK2XYGQM4</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Disposed</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Electronic Devices</Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number">2648.69</Data></Cell>
+<Cell ss:StyleID="s__DATE"><Data ss:Type="DateTime">2026-02-28T00:00:00</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Write-off</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">0</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">1</Data></Cell>
+</Row>
+<Row><Cell ss:StyleID="s__text"><Data ss:Type="String">FAM048613</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">APPLE MBP 14 M4M 14C32C 36GB 1TB SB Serial No: LV6FJ9L9MH</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Disposed</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Electronic Devices</Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number">3469.60</Data></Cell>
+<Cell ss:StyleID="s__DATE"><Data ss:Type="DateTime">2026-02-28T00:00:00</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Write-off</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">0</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">1</Data></Cell>
+</Row>
+<Row><Cell ss:StyleID="s__text"><Data ss:Type="String">FAM048681</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">APPLE MBA 13 10C10C M4 16 512 35W MN; Serial No: GFK4GWXMPP</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Disposed</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Electronic Devices</Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number">1266.81</Data></Cell>
+<Cell ss:StyleID="s__DATE"><Data ss:Type="DateTime">2026-02-28T00:00:00</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String">Write-off</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">0</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">1</Data></Cell>
+</Row>
+<Row><Cell ss:StyleID="s__text"><Data ss:Type="String">Total</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number">10738.12</Data></Cell>
+<Cell ss:StyleID="s__DATE"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s_currency_nosymbol"><Data ss:Type="Number">0.00</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="String"></Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">0.0</Data></Cell>
+<Cell ss:StyleID="s__text"><Data ss:Type="Number">5</Data></Cell>
+</Row>
+</Table>
+</Worksheet>
+</Workbook>

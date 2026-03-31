@@ -1,0 +1,163 @@
+<head>
+    <meta charset="utf-8" />
+    <link name="NotoSansThai" type="font" subtype="opentype" 
+          src="NetSuiteFonts/NotoSansThai-Regular.ttf" 
+          src-bold="NetSuiteFonts/NotoSansThai-Bold.ttf" 
+          src-italic="NetSuiteFonts/NotoSansThai-Regular.ttf" 
+          src-bolditalic="NetSuiteFonts/NotoSansThai-Bold.ttf" 
+          bytes="2" />
+    <style>
+        body {
+            font-family: Arial, Verdana, Helvetica, NotoSansThai, stsong, msung, mhei, heiseimin, heiseikakugo, hygothic, hysmyeongjo;
+            font-size: 10px;
+        }
+    </style>
+        <macrolist>
+      <macro id="pagenum">
+        <p align="right">
+           Page <pagenumber/> of <totalpages/>
+        </p>
+      </macro>
+    </macrolist>
+</head>
+<body footer="pagenum">
+            <p style="font-size: 18px; color: #003399">Asset Summary Report</p>
+        <table>
+            <tr>
+                <td colspan="9" style="font-weight: bold; font-size: 12px;"><p align="center">Fixed Assets Management - Quizlet, Inc. USD</p></td>
+            </tr>
+            <tr>
+                <td colspan="9"><p align="center">GL Posting</p></td>
+            </tr>
+            <tr>
+                <td colspan="9"><p align="center">Accounting Method - All Assets</p></td>
+            </tr>
+            <tr>
+                <td colspan="9"><p align="center">Feb 1, 2026 - Feb 28, 2026</p></td>
+            </tr>
+            <tr>
+                <td width="225px" margin-bottom="3px"></td>
+                <td width="130px"><p style="font-weight: bold;" align="right">Beginning Balance</p></td>
+                <td width="130px"><p style="font-weight: bold;" align="right">Additions</p></td>
+                <td width="130px"><p style="font-weight: bold;" align="right">Sale</p></td>
+                <td width="130px"><p style="font-weight: bold;" align="right">Disposals</p></td>
+                <td width="130px"><p style="font-weight: bold;" align="right">Transfers</p></td>
+                <td width="130px"><p style="font-weight: bold;" align="right">Revaluations</p></td>
+                <td width="130px"><p style="font-weight: bold;" align="right">Leases</p></td>
+                <td width="130px"><p style="font-weight: bold;" align="right">Ending Balance</p></td>
+            </tr>
+        
+            <tr>
+                <td style="font-weight: bold;" ><p align="left">COST</p></td>
+                    <td colspan="8"></td>
+            </tr>
+        
+            <tr>
+                <td style="font-weight: bold;" ><p align="left">Electronic Devices</p></td>
+                    <td style="font-size: 9px"><p align="right">2,175,251.64</p></td>
+                    <td style="font-size: 9px"><p align="right">44,270.65</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">10,738.12</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">2,208,784.17</p></td>
+            </tr>
+        
+            <tr>
+                <td></td>
+                <td colspan="8" style="border-top-style: solid; border-top-width: 1px;" margin-bottom="1px"> </td>
+            </tr>
+        
+            <tr>
+                <td style="font-weight: bold;" margin-bottom="7px"><p align="left"></p></td>
+                    <td style="font-size: 9px"><p align="right">2,175,251.64</p></td>
+                    <td style="font-size: 9px"><p align="right">44,270.65</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">10,738.12</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">2,208,784.17</p></td>
+            </tr>
+        
+            <tr>
+                <td style="font-weight: bold;" ><p align="left">DEPRECIATION</p></td>
+                    <td colspan="8"></td>
+            </tr>
+        
+            <tr>
+                <td style="font-weight: bold;" ><p align="left">Electronic Devices</p></td>
+                    <td style="font-size: 9px"><p align="right">1,794,410.28</p></td>
+                    <td style="font-size: 9px"><p align="right">16,185.99</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">1,810,596.27</p></td>
+            </tr>
+        
+            <tr>
+                <td></td>
+                <td colspan="8" style="border-top-style: solid; border-top-width: 1px;" margin-bottom="1px"> </td>
+            </tr>
+        
+            <tr>
+                <td style="font-weight: bold;" margin-bottom="7px"><p align="left"></p></td>
+                    <td style="font-size: 9px"><p align="right">1,794,410.28</p></td>
+                    <td style="font-size: 9px"><p align="right">16,185.99</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">1,810,596.27</p></td>
+            </tr>
+        
+            <tr>
+                <td style="font-weight: bold;" ><p align="left">NET BOOK VALUE</p></td>
+                    <td colspan="8"></td>
+            </tr>
+        
+            <tr>
+                <td style="font-weight: bold;" ><p align="left">Electronic Devices</p></td>
+                    <td style="font-size: 9px"><p align="right">380,841.36</p></td>
+                    <td style="font-size: 9px"><p align="right">28,084.66</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">10,738.12</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">398,187.90</p></td>
+            </tr>
+        
+            <tr>
+                <td></td>
+                <td colspan="8" style="border-top-style: solid; border-top-width: 1px;" margin-bottom="1px"> </td>
+            </tr>
+        
+            <tr>
+                <td style="font-weight: bold;" margin-bottom="7px"><p align="left"></p></td>
+                    <td style="font-size: 9px"><p align="right">380,841.36</p></td>
+                    <td style="font-size: 9px"><p align="right">28,084.66</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">10,738.12</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">0.00</p></td>
+                    <td style="font-size: 9px"><p align="right">398,187.90</p></td>
+            </tr>
+        
+            <tr>
+                <td></td>
+                <td colspan="8" style="border-top-style: solid; border-top-width: 1px;" margin-bottom="1px"> </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="8" style="border-top-style: solid; border-top-width: 1px;" margin-bottom="4px"> </td>
+            </tr>
+        </table> 
+        
+        
+</body>

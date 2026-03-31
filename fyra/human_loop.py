@@ -17,18 +17,32 @@ def ask_human(question: str, context: str = "") -> str:
     return response
 
 
-def gather_file_context(file_paths: list[Path]) -> dict[str, str]:
-    """Ask human what each input file represents before parsing the SOP."""
+def gather_file_context(
+    file_paths: list[Path],
+    inferred: dict[str, str] | None = None,
+) -> dict[str, str]:
+    """Build file context dict.
+
+    If `inferred` is provided (filename → auto-inferred description), shows each
+    inference to the user for a quick confirm-or-correct instead of asking from scratch.
+    Falls back to asking from scratch for any file not in `inferred`.
+    """
     print("\n" + "=" * 60)
-    print("FILE CONTEXT — please describe each input file")
-    print("This helps the agent interpret the SOP correctly.")
+    print("FILE CONTEXT — confirm or correct each file description")
     print("=" * 60)
 
     context: dict[str, str] = {}
     for path in file_paths:
-        answer = ask_human(f"What does '{path.name}' represent in this workflow?")
-        context[path.name] = answer
-        logger.info("File context: %s → %s", path.name, answer)
+        name = path.name
+        if inferred and name in inferred:
+            print(f"\n  File: {name}")
+            print(f"  Inferred: {inferred[name]}")
+            answer = input("  Correct? Press Enter to accept, or type a correction: ").strip()
+            description = answer if answer else inferred[name]
+        else:
+            description = ask_human(f"What does '{name}' represent in this workflow?")
+        context[name] = description
+        logger.info("File context: %s → %s", name, description)
 
     return context
 

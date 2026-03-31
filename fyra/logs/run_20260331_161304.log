@@ -1,0 +1,181 @@
+2026-03-31 16:13:04 | INFO     | main                 | Logging initialised — file: /Users/ab/Documents/Archieve/zalos_take_home/fyra/logs/run_20260331_161304.log
+2026-03-31 16:13:04 | INFO     | main                 | ============================================================
+2026-03-31 16:13:04 | INFO     | main                 | SOP Automation Agent — run 20260331_161304
+2026-03-31 16:13:04 | INFO     | main                 | ============================================================
+2026-03-31 16:13:04 | INFO     | main                 | Output file copied to: /Users/ab/Documents/Archieve/zalos_take_home/fyra/output/VAT-Avalara Sales Tax December 2025 ZalosCopy_20260331_161304.xlsx
+2026-03-31 16:13:04 | INFO     | main                 | Original output file will NOT be modified: /Users/ab/Documents/Archieve/zalos_take_home/raw_data/zalos_test_data/VAT-Avalara Sales Tax December 2025 ZalosCopy.xlsx
+2026-03-31 16:13:04 | INFO     | main                 | SOP file     : /Users/ab/Documents/Archieve/zalos_take_home/raw_data/zalos_test_data/Avalara VAT Report SOP.docx
+2026-03-31 16:13:04 | INFO     | main                 | Working copy : /Users/ab/Documents/Archieve/zalos_take_home/fyra/output/VAT-Avalara Sales Tax December 2025 ZalosCopy_20260331_161304.xlsx
+2026-03-31 16:13:04 | INFO     | main                 | Input files  :
+2026-03-31 16:13:04 | INFO     | main                 |   /Users/ab/Documents/Archieve/zalos_take_home/raw_data/zalos_test_data/SalesTaxDocumentLineExport-Dec 2025.xlsx
+2026-03-31 16:13:05 | DEBUG    | httpcore.connection  | connect_tcp.started host='raw.githubusercontent.com' port=443 local_address=None timeout=5 socket_options=None
+2026-03-31 16:13:05 | DEBUG    | httpcore.connection  | connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x10a782180>
+2026-03-31 16:13:05 | DEBUG    | httpcore.connection  | start_tls.started ssl_context=<ssl.SSLContext object at 0x10aa228d0> server_hostname='raw.githubusercontent.com' timeout=5
+2026-03-31 16:13:05 | DEBUG    | httpcore.connection  | start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x10a228560>
+2026-03-31 16:13:05 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'GET']>
+2026-03-31 16:13:05 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:13:05 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'GET']>
+2026-03-31 16:13:05 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:13:05 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'GET']>
+2026-03-31 16:13:05 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Connection', b'keep-alive'), (b'Content-Length', b'67868'), (b'Cache-Control', b'max-age=300'), (b'Content-Security-Policy', b"default-src 'none'; style-src 'unsafe-inline'; sandbox"), (b'Content-Type', b'text/plain; charset=utf-8'), (b'ETag', b'W/"6199a6796d83e8ebd78c80b2a12d6fb1a0b1eaca9201ca6cd34ad68001dfcf3e"'), (b'Strict-Transport-Security', b'max-age=31536000'), (b'X-Content-Type-Options', b'nosniff'), (b'X-Frame-Options', b'deny'), (b'X-XSS-Protection', b'1; mode=block'), (b'X-GitHub-Request-Id', b'3D48:83BEC:36673C:67170A:69C8981C'), (b'Content-Encoding', b'gzip'), (b'Accept-Ranges', b'bytes'), (b'Date', b'Tue, 31 Mar 2026 15:13:05 GMT'), (b'Via', b'1.1 varnish'), (b'X-Served-By', b'cache-lon4248-LON'), (b'X-Cache', b'HIT'), (b'X-Cache-Hits', b'6'), (b'X-Timer', b'S1774969986.613502,VS0,VE0'), (b'Vary', b'Authorization,Accept-Encoding'), (b'Access-Control-Allow-Origin', b'*'), (b'Cross-Origin-Resource-Policy', b'cross-origin'), (b'X-Fastly-Request-ID', b'e697e698b427d44c43b07fcf99e19bfbe3e6e85d'), (b'Expires', b'Tue, 31 Mar 2026 15:18:05 GMT'), (b'Source-Age', b'150')])
+2026-03-31 16:13:05 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'GET']>
+2026-03-31 16:13:05 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:13:05 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:13:05 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:13:05 | DEBUG    | httpcore.connection  | close.started
+2026-03-31 16:13:05 | DEBUG    | httpcore.connection  | close.complete
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | [Non-Blocking] Unable to import GenericAPILogger - LiteLLM Enterprise Feature - No module named 'litellm_enterprise'
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | Using AiohttpTransport...
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | Creating AiohttpTransport...
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | NEW SESSION: Creating new ClientSession (no shared session provided)
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | Using AiohttpTransport...
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | Creating AiohttpTransport...
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | NEW SESSION: Creating new ClientSession (no shared session provided)
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | Using AiohttpTransport...
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | Creating AiohttpTransport...
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | NEW SESSION: Creating new ClientSession (no shared session provided)
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | Using AiohttpTransport...
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | Creating AiohttpTransport...
+2026-03-31 16:13:08 | DEBUG    | LiteLLM              | NEW SESSION: Creating new ClientSession (no shared session provided)
+2026-03-31 16:13:10 | INFO     | agent                | Configuring DSPy LM
+2026-03-31 16:18:06 | DEBUG    | human_loop           | ask_human | Q: What does 'SalesTaxDocumentLineExport-Dec 2025.xlsx' represent in this workflow? | A: SalesTaxDocumentLineExport-Dec 2025.xlsx is the primary Avalara source export for the December 2025 VAT workflow. In this repo, the SOP explicitly describes it as the Sales Tax Document Line Export input, and the automation is wired to read that file as its only default input, then transform/copy it into the working VAT workbook.
+2026-03-31 16:18:06 | INFO     | human_loop           | File context: SalesTaxDocumentLineExport-Dec 2025.xlsx → SalesTaxDocumentLineExport-Dec 2025.xlsx is the primary Avalara source export for the December 2025 VAT workflow. In this repo, the SOP explicitly describes it as the Sales Tax Document Line Export input, and the automation is wired to read that file as its only default input, then transform/copy it into the working VAT workbook.
+2026-03-31 16:18:06 | INFO     | agent                | Parsing SOP: /Users/ab/Documents/Archieve/zalos_take_home/raw_data/zalos_test_data/Avalara VAT Report SOP.docx
+2026-03-31 16:18:06 | DEBUG    | sop_parser           | SOPParser: parsing SOP (5253 chars)
+2026-03-31 16:18:06 | DEBUG    | httpcore.connection  | connect_tcp.started host='api.anthropic.com' port=443 local_address=None timeout=600.0 socket_options=None
+2026-03-31 16:18:06 | DEBUG    | httpcore.connection  | connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11709c440>
+2026-03-31 16:18:06 | DEBUG    | httpcore.connection  | start_tls.started ssl_context=<ssl.SSLContext object at 0x115864050> server_hostname='api.anthropic.com' timeout=600.0
+2026-03-31 16:18:06 | DEBUG    | httpcore.connection  | start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x116c65b20>
+2026-03-31 16:18:06 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:18:06 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:18:06 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:18:06 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:18:06 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:18:27 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Tue, 31 Mar 2026 15:18:27 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'anthropic-ratelimit-input-tokens-limit', b'4000000'), (b'anthropic-ratelimit-input-tokens-remaining', b'3999000'), (b'anthropic-ratelimit-input-tokens-reset', b'2026-03-31T15:18:11Z'), (b'anthropic-ratelimit-output-tokens-limit', b'800000'), (b'anthropic-ratelimit-output-tokens-remaining', b'799000'), (b'anthropic-ratelimit-output-tokens-reset', b'2026-03-31T15:18:27Z'), (b'anthropic-ratelimit-requests-limit', b'4000'), (b'anthropic-ratelimit-requests-remaining', b'3999'), (b'anthropic-ratelimit-requests-reset', b'2026-03-31T15:18:06Z'), (b'anthropic-ratelimit-tokens-limit', b'4800000'), (b'anthropic-ratelimit-tokens-remaining', b'4798000'), (b'anthropic-ratelimit-tokens-reset', b'2026-03-31T15:18:11Z'), (b'request-id', b'req_011CZbP4KEwHLXVbVfwB8yEm'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'anthropic-organization-id', b'3f8be262-7154-4d5b-be4d-33237de9e4ae'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'21131'), (b'Content-Encoding', b'gzip'), (b'vary', b'Accept-Encoding'), (b'server-timing', b'x-originResponse;dur=21133'), (b'cf-cache-status', b'DYNAMIC'), (b'set-cookie', b'_cfuvid=rKNNLWReEP0CGiGb5HbnDk4SlkhAUMs0Pp.8WD4I258-1774970286.6033201-1.0.1.1-pzm_h8K1tGTD5_9anHV3zL05v3NR98nIEUUrXGlfNgY; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.anthropic.com'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9e50532348a9b692-LHR')])
+2026-03-31 16:18:27 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:18:27 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:18:27 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:18:27 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:18:27 | INFO     | sop_parser           | SOPParser: 9 steps extracted
+2026-03-31 16:18:27 | DEBUG    | sop_parser           |   Step 1: Currency Validation Check (Critical Control) - Add validation columns to SalesTaxDocumentLineExport. Create a formula column concatenating DOCUMENTDATE and CURRENCYCODE in format 'm-dd-yyyy-CURRENCYCODE'. Add FX Rate column using VLOOKUP to match date-currency pairs. Calculate USD Sales Amount (FX Rate × Line Amount) and USD Tax Amount (FX Rate × Tax Amount). Add EU Countries column using VLOOKUP to identify EU member states. Flag any transactions where COUNTRY = 'US' and any rows with missing FX rates.
+2026-03-31 16:18:27 | DEBUG    | sop_parser           |   Step 2: Generate Pivot Table 1 (by Currency) - Create pivot table from validated SalesTaxDocumentLineExport with Country and Currency Code as row fields, aggregating USD Sales Amount and USD Tax Amount as values. Name this tab 'PIVOT (CURR)'. Paste the corresponding pivot from the previous month's VAT report in Column F for comparison.
+2026-03-31 16:18:27 | DEBUG    | sop_parser           |   Step 3: Generate Pivot Table 2 (by Document Status) - Create pivot table from validated SalesTaxDocumentLineExport with Document Status as filter, Country as rows, aggregating USD Sales Amount and USD Tax Amount. Name this tab 'PIVOT (Summary)'. Filter to exclude blank EU country entries. Paste corresponding pivot from previous month report in Column H for comparison.
+2026-03-31 16:18:27 | DEBUG    | sop_parser           |   Step 4: Clean and Filter Sales Tax Data - Copy SalesTaxDocumentLineExport-Dec 2025.xlsx to new sheet named 'AVALARA SALES TAX DETAIL-ALL'. Exclude all rows where EXEMPTREASON = 'Customer is exempt. Does not have nexus in state.' Filter DocumentStatus = 'Committed'. Generate a pivot table with the cleaned data. Add GL Account mapping section in Column E using the provided country-to-GL code mapping (AU→20731, CA→20732, CH/LI→20734, GB/IM→20736, EU Countries→20735, PH→20737). Summarize VAT liability by GL code.
+2026-03-31 16:18:27 | DEBUG    | sop_parser           |   Step 5: Generate Country-Level VAT Summary - From the filtered and validated data, produce a summary report showing: Country name, USD Sales total, USD VAT Liability total. Include all countries processed and their corresponding GL account codes. Ensure total USD Tax Amount matches raw dataset total as a reconciliation control.
+2026-03-31 16:18:27 | DEBUG    | sop_parser           |   Step 6: Generate GL Reconciliation Summary - Summarize total VAT Liability by GL account code. Produce a reconciliation showing total VAT across all GL codes. Cross-check that the sum of all GL-level VAT equals the total VAT Liability from the Avalara export (variance analysis).
+2026-03-31 16:18:27 | DEBUG    | sop_parser           |   Step 7: Generate Month-over-Month Comparison Report - Compare current month VAT (USD) against prior month figures from the VAT Avalara Sales Tax Report (PIVOT and EU Countries tabs). Calculate variance by country and variance percentage. Highlight significant changes (>threshold to be defined operationally).
+2026-03-31 16:18:27 | DEBUG    | sop_parser           |   Step 8: Generate Exception and Flag Report - Compile comprehensive exception report documenting: (1) US transactions flagged, (2) Missing FX rate lookups, (3) FX lookup failures, (4) Exempt transactions removed (count and amounts), (5) Countries without GL mapping, (6) Variance exceptions between pivot total and raw dataset totals. Include reason codes for each exception.
+2026-03-31 16:18:27 | DEBUG    | sop_parser           |   Step 9: Generate Final VAT Workbook Output - Consolidate all processing outputs into a single standardized VAT workbook containing: (1) Cleaned detail sheet with USD conversions and GL mappings, (2) PIVOT (CURR) tab with currency-level summary, (3) PIVOT (Summary) tab with country-level summary, (4) Country-Level VAT Summary, (5) GL Reconciliation Summary, (6) Month-over-Month Comparison, (7) Exception Report. Maintain complete audit trail of source totals, exclusions, conversions, and final outputs.
+2026-03-31 16:18:27 | INFO     | agent                | SOP parsed into 9 steps
+2026-03-31 16:18:27 | INFO     | agent                | ==================================================
+2026-03-31 16:18:27 | INFO     | agent                | Starting step 1: Currency Validation Check (Critical Control) - Add validation columns to SalesTaxDocumentLineExport. Create a formula column concatenating DOCUMENTDATE and CURRENCYCODE in format 'm-dd-yyyy-CURRENCYCODE'. Add FX Rate column using VLOOKUP to match date-currency pairs. Calculate USD Sales Amount (FX Rate × Line Amount) and USD Tax Amount (FX Rate × Tax Amount). Add EU Countries column using VLOOKUP to identify EU member states. Flag any transactions where COUNTRY = 'US' and any rows with missing FX rates.
+2026-03-31 16:18:27 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:18:27 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:18:27 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:18:27 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:18:27 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:18:29 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Tue, 31 Mar 2026 15:18:29 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'anthropic-ratelimit-input-tokens-limit', b'4000000'), (b'anthropic-ratelimit-input-tokens-remaining', b'3999000'), (b'anthropic-ratelimit-input-tokens-reset', b'2026-03-31T15:18:28Z'), (b'anthropic-ratelimit-output-tokens-limit', b'800000'), (b'anthropic-ratelimit-output-tokens-remaining', b'800000'), (b'anthropic-ratelimit-output-tokens-reset', b'2026-03-31T15:18:29Z'), (b'anthropic-ratelimit-requests-limit', b'4000'), (b'anthropic-ratelimit-requests-remaining', b'3999'), (b'anthropic-ratelimit-requests-reset', b'2026-03-31T15:18:27Z'), (b'anthropic-ratelimit-tokens-limit', b'4800000'), (b'anthropic-ratelimit-tokens-remaining', b'4799000'), (b'anthropic-ratelimit-tokens-reset', b'2026-03-31T15:18:28Z'), (b'request-id', b'req_011CZbP5tFpmnHXmmKxtfWpe'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'anthropic-organization-id', b'3f8be262-7154-4d5b-be4d-33237de9e4ae'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'1768'), (b'Content-Encoding', b'gzip'), (b'vary', b'Accept-Encoding'), (b'server-timing', b'x-originResponse;dur=1770'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'CF-RAY', b'9e5053a8585cb692-LHR')])
+2026-03-31 16:18:29 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:18:29 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:18:29 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:18:29 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:18:29 | DEBUG    | tools                | list_sheets: /Users/ab/Documents/Archieve/zalos_take_home/raw_data/zalos_test_data/SalesTaxDocumentLineExport-Dec 2025.xlsx
+2026-03-31 16:18:31 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:18:31 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:18:31 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:18:31 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:18:31 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:18:32 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Tue, 31 Mar 2026 15:18:32 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'anthropic-ratelimit-input-tokens-limit', b'4000000'), (b'anthropic-ratelimit-input-tokens-remaining', b'3999000'), (b'anthropic-ratelimit-input-tokens-reset', b'2026-03-31T15:18:32Z'), (b'anthropic-ratelimit-output-tokens-limit', b'800000'), (b'anthropic-ratelimit-output-tokens-remaining', b'800000'), (b'anthropic-ratelimit-output-tokens-reset', b'2026-03-31T15:18:32Z'), (b'anthropic-ratelimit-requests-limit', b'4000'), (b'anthropic-ratelimit-requests-remaining', b'3999'), (b'anthropic-ratelimit-requests-reset', b'2026-03-31T15:18:31Z'), (b'anthropic-ratelimit-tokens-limit', b'4800000'), (b'anthropic-ratelimit-tokens-remaining', b'4799000'), (b'anthropic-ratelimit-tokens-reset', b'2026-03-31T15:18:32Z'), (b'request-id', b'req_011CZbP6AKU2nkerYHyPZKqm'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'anthropic-organization-id', b'3f8be262-7154-4d5b-be4d-33237de9e4ae'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'1244'), (b'Content-Encoding', b'gzip'), (b'vary', b'Accept-Encoding'), (b'server-timing', b'x-originResponse;dur=1246'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'CF-RAY', b'9e5053bfcd0db692-LHR')])
+2026-03-31 16:18:32 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:18:32 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:18:32 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:18:32 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:18:32 | DEBUG    | tools                | read_excel: /Users/ab/Documents/Archieve/zalos_take_home/raw_data/zalos_test_data/SalesTaxDocumentLineExport-Dec 2025.xlsx | sheet=SalesTaxDocumentLineExport-ALL
+2026-03-31 16:18:54 | DEBUG    | tools                | read_excel: 169878 records returned
+2026-03-31 16:18:57 | DEBUG    | httpcore.connection  | close.started
+2026-03-31 16:18:57 | DEBUG    | httpcore.connection  | close.complete
+2026-03-31 16:18:57 | DEBUG    | httpcore.connection  | connect_tcp.started host='api.anthropic.com' port=443 local_address=None timeout=600.0 socket_options=None
+2026-03-31 16:18:57 | DEBUG    | httpcore.connection  | connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x12c2b8ad0>
+2026-03-31 16:18:57 | DEBUG    | httpcore.connection  | start_tls.started ssl_context=<ssl.SSLContext object at 0x115864050> server_hostname='api.anthropic.com' timeout=600.0
+2026-03-31 16:18:57 | DEBUG    | httpcore.connection  | start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x12c2b8e90>
+2026-03-31 16:18:57 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:18:57 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:18:57 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:19:13 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:19:13 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:19:13 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 413, b'Payload Too Large', [(b'Date', b'Tue, 31 Mar 2026 15:19:13 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'103'), (b'Connection', b'keep-alive'), (b'Cache-Control', b'private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0'), (b'Expires', b'Thu, 01 Jan 1970 00:00:01 GMT'), (b'Referrer-Policy', b'same-origin'), (b'X-Frame-Options', b'SAMEORIGIN'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'X-Robots-Tag', b'none'), (b'Server', b'cloudflare'), (b'CF-RAY', b'9e5054619be26548-LHR')])
+2026-03-31 16:19:13 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:19:13 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:19:13 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:19:13 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:19:15 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:19:15 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:19:15 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:19:29 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:19:29 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:19:29 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 413, b'Payload Too Large', [(b'Date', b'Tue, 31 Mar 2026 15:19:29 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'103'), (b'Connection', b'keep-alive'), (b'Cache-Control', b'private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0'), (b'Expires', b'Thu, 01 Jan 1970 00:00:01 GMT'), (b'Referrer-Policy', b'same-origin'), (b'X-Frame-Options', b'SAMEORIGIN'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'X-Robots-Tag', b'none'), (b'Server', b'cloudflare'), (b'CF-RAY', b'9e5054d1d97f6548-LHR')])
+2026-03-31 16:19:29 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:19:29 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:19:29 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:19:29 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:19:32 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:19:32 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:19:32 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:19:47 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:19:47 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:19:47 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 413, b'Payload Too Large', [(b'Date', b'Tue, 31 Mar 2026 15:19:47 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'103'), (b'Connection', b'keep-alive'), (b'Cache-Control', b'private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0'), (b'Expires', b'Thu, 01 Jan 1970 00:00:01 GMT'), (b'Referrer-Policy', b'same-origin'), (b'X-Frame-Options', b'SAMEORIGIN'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'X-Robots-Tag', b'none'), (b'Server', b'cloudflare'), (b'CF-RAY', b'9e50553e1d506548-LHR')])
+2026-03-31 16:19:47 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:19:47 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:19:47 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:19:47 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:19:50 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:19:50 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:19:50 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:20:04 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:20:04 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:20:04 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 413, b'Payload Too Large', [(b'Date', b'Tue, 31 Mar 2026 15:20:04 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'103'), (b'Connection', b'keep-alive'), (b'Cache-Control', b'private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0'), (b'Expires', b'Thu, 01 Jan 1970 00:00:01 GMT'), (b'Referrer-Policy', b'same-origin'), (b'X-Frame-Options', b'SAMEORIGIN'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'X-Robots-Tag', b'none'), (b'Server', b'cloudflare'), (b'CF-RAY', b'9e5055af9ebd6548-LHR')])
+2026-03-31 16:20:04 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:20:04 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:20:04 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:20:04 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:20:07 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:20:07 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:20:07 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:20:20 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:20:20 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:20:20 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 413, b'Payload Too Large', [(b'Date', b'Tue, 31 Mar 2026 15:20:20 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'103'), (b'Connection', b'keep-alive'), (b'Cache-Control', b'private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0'), (b'Expires', b'Thu, 01 Jan 1970 00:00:01 GMT'), (b'Referrer-Policy', b'same-origin'), (b'X-Frame-Options', b'SAMEORIGIN'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'X-Robots-Tag', b'none'), (b'Server', b'cloudflare'), (b'CF-RAY', b'9e50561448fc6548-LHR')])
+2026-03-31 16:20:20 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:20:20 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:20:20 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:20:20 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:20:22 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:20:22 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:20:22 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:20:37 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:20:37 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:20:37 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 413, b'Payload Too Large', [(b'Date', b'Tue, 31 Mar 2026 15:20:37 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'103'), (b'Connection', b'keep-alive'), (b'Cache-Control', b'private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0'), (b'Expires', b'Thu, 01 Jan 1970 00:00:01 GMT'), (b'Referrer-Policy', b'same-origin'), (b'X-Frame-Options', b'SAMEORIGIN'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'X-Robots-Tag', b'none'), (b'Server', b'cloudflare'), (b'CF-RAY', b'9e5056763bb66548-LHR')])
+2026-03-31 16:20:37 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:20:37 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:20:37 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:20:37 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:20:40 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:20:40 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:20:40 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:20:56 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:20:56 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:20:56 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 413, b'Payload Too Large', [(b'Date', b'Tue, 31 Mar 2026 15:20:56 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'103'), (b'Connection', b'keep-alive'), (b'Cache-Control', b'private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0'), (b'Expires', b'Thu, 01 Jan 1970 00:00:01 GMT'), (b'Referrer-Policy', b'same-origin'), (b'X-Frame-Options', b'SAMEORIGIN'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'X-Robots-Tag', b'none'), (b'Server', b'cloudflare'), (b'CF-RAY', b'9e5056e2e89d6548-LHR')])
+2026-03-31 16:20:56 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:20:56 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:20:56 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:20:56 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:21:00 | DEBUG    | httpcore.http11      | send_request_headers.started request=<Request [b'POST']>
+2026-03-31 16:21:00 | DEBUG    | httpcore.http11      | send_request_headers.complete
+2026-03-31 16:21:00 | DEBUG    | httpcore.http11      | send_request_body.started request=<Request [b'POST']>
+2026-03-31 16:21:16 | DEBUG    | httpcore.http11      | send_request_body.complete
+2026-03-31 16:21:16 | DEBUG    | httpcore.http11      | receive_response_headers.started request=<Request [b'POST']>
+2026-03-31 16:21:17 | DEBUG    | httpcore.http11      | receive_response_headers.complete return_value=(b'HTTP/1.1', 413, b'Payload Too Large', [(b'Date', b'Tue, 31 Mar 2026 15:21:17 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'103'), (b'Connection', b'keep-alive'), (b'Cache-Control', b'private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0'), (b'Expires', b'Thu, 01 Jan 1970 00:00:01 GMT'), (b'Referrer-Policy', b'same-origin'), (b'X-Frame-Options', b'SAMEORIGIN'), (b'Content-Security-Policy', b"default-src 'none'; frame-ancestors 'none'"), (b'X-Robots-Tag', b'none'), (b'Server', b'cloudflare'), (b'CF-RAY', b'9e50575f48556548-LHR')])
+2026-03-31 16:21:17 | DEBUG    | httpcore.http11      | receive_response_body.started request=<Request [b'POST']>
+2026-03-31 16:21:17 | DEBUG    | httpcore.http11      | receive_response_body.complete
+2026-03-31 16:21:17 | DEBUG    | httpcore.http11      | response_closed.started
+2026-03-31 16:21:17 | DEBUG    | httpcore.http11      | response_closed.complete
+2026-03-31 16:21:17 | DEBUG    | asyncio              | Using selector: KqueueSelector

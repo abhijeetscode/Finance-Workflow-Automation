@@ -53,6 +53,19 @@ class ExecuteSOPStep(dspy.Signature):
     )
 
 
+class InferFileRole(dspy.Signature):
+    """Infer what role an input file plays in a financial SOP workflow,
+    based on its filename and a sample of its column headers and data rows."""
+
+    file_name: str = dspy.InputField()
+    sample_data: str = dspy.InputField(
+        desc="JSON with 'columns' list and 'rows' sample from the file"
+    )
+    description: str = dspy.OutputField(
+        desc="One concise sentence describing what this file is and its role in the workflow"
+    )
+
+
 class BuildFormulaSubstitutions(dspy.Signature):
     """Build a substitution dict covering every date/period format variant found in Excel formulas.
     e.g. source=January 2026, target=February 2026 →

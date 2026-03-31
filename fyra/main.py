@@ -22,19 +22,16 @@ load_dotenv("../.env")  # Load environment variables from .env file
 # ---------------------------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).parent.parent
-RAW_DATA = PROJECT_ROOT / "raw_data"
+RAW_DATA = PROJECT_ROOT / "raw_data" / "zalos_test_data"
 
-DEFAULT_SOP = RAW_DATA / "Fixed Asset Rollforward Instructions.docx"
+DEFAULT_SOP = RAW_DATA / "Avalara VAT Report SOP.docx"
 
 # The file agent will write into (a copy is made — original never touched)
-DEFAULT_OUTPUT = RAW_DATA / "Outpu_Template.xlsx"
+DEFAULT_OUTPUT = RAW_DATA / "VAT-Avalara Sales Tax December 2025 ZalosCopy.xlsx"
 
 # All input/reference files the agent can read
 DEFAULT_INPUT_FILES = [
-	RAW_DATA / "FAMAdditionsResults912.xls",
-	RAW_DATA / "FAMDisposalsResults708.xls",
-	RAW_DATA / "FAM_DeprSchedule_FPR72454.xml",
-	RAW_DATA / "FAM_SummaryReport_FPR72456.xml",
+	RAW_DATA / "SalesTaxDocumentLineExport-Dec 2025.xlsx",
 ]
 
 OUTPUT_DIR = Path(__file__).parent / "output"
@@ -43,6 +40,20 @@ LOGS_DIR = Path(__file__).parent / "logs"
 # ---------------------------------------------------------------------------
 # Logging setup
 # ---------------------------------------------------------------------------
+
+
+_NOISY_LOGGERS = [
+	"httpcore",
+	"httpx",
+	"LiteLLM",
+	"litellm",
+	"openai",
+	"anthropic",
+	"urllib3",
+	"dspy.utils.callback",
+	"dspy.clients",
+	"dspy.adapters",
+]
 
 
 def setup_logging(run_id: str) -> logging.Logger:
@@ -55,12 +66,12 @@ def setup_logging(run_id: str) -> logging.Logger:
 		datefmt="%Y-%m-%d %H:%M:%S",
 	)
 
-	# File handler — DEBUG and above (full detail for post-run debugging)
+	# File handler — DEBUG for our code only
 	file_handler = logging.FileHandler(log_file, encoding="utf-8")
 	file_handler.setLevel(logging.DEBUG)
 	file_handler.setFormatter(fmt)
 
-	# Console handler — INFO and above (clean output for human watching)
+	# Console handler — INFO and above
 	console_handler = logging.StreamHandler(sys.stdout)
 	console_handler.setLevel(logging.INFO)
 	console_handler.setFormatter(fmt)
@@ -69,6 +80,10 @@ def setup_logging(run_id: str) -> logging.Logger:
 	root_logger.setLevel(logging.DEBUG)
 	root_logger.addHandler(file_handler)
 	root_logger.addHandler(console_handler)
+
+	# Silence noisy third-party loggers in both file and console
+	for name in _NOISY_LOGGERS:
+		logging.getLogger(name).setLevel(logging.WARNING)
 
 	logger = logging.getLogger("main")
 	logger.info("Logging initialised — file: %s", log_file)

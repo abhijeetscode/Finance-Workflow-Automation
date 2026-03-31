@@ -45,10 +45,10 @@ def invoke_codegen_agent(file_path: str, instructions: str) -> str:
 
 
 @tool
-def invoke_sop_agent(file_path: str, instructions: str) -> str:
-	"""Delegate to the SOP agent to execute steps from an SOP document."""
+def invoke_sop_agent(files: list[str], instructions: str) -> str:
+	"""Delegate to the SOP agent to execute steps from an SOP document and supporting files."""
 	from orchestrator.sop_agent import run
 
-	result = run(file_path=file_path, instructions=instructions)
+	result = run(files=files, instructions=instructions)
 	status = "SUCCESS" if result.get("status") != "failure" else "FAILURE"
 	return f"{status}: {result['message']}"

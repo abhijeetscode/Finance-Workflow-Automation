@@ -2,7 +2,6 @@ import asyncio
 import json
 import logging
 import os
-import sys
 import uuid
 from pathlib import Path
 from typing import Annotated, Literal
@@ -17,7 +16,6 @@ from langgraph.graph.message import add_messages
 from pydantic import BaseModel
 from typing_extensions import TypedDict
 
-from orchestrator.memory import find_similar_runs, format_runs_for_context
 from orchestrator.tools.subagents import ask_user, invoke_codegen_agent, invoke_sop_agent, log_run
 
 load_dotenv("../.env")
@@ -46,7 +44,7 @@ logger = structlog.get_logger("Orchestrator")
 
 class PlanStep(BaseModel):
 	agent: Literal["codegen_agent", "sop_agent"]
-	file: str
+	files: list[str]
 	instructions: str
 
 
@@ -73,7 +71,10 @@ Available agents:
 - sop_agent: executes a business process by following steps in an SOP document (.docx)
 
 Rules:
-- Each step assigns one file to one agent
+- Each step assigns one or more files to one agent
+- Use only the files needed for that step, in the correct order
+- codegen_agent should usually receive exactly one Excel input file
+- sop_agent may require an SOP document plus additional supporting files
 - Chain agents when the objective requires it (e.g. extract SOP steps → feed into codegen_agent)
 - Keep the plan as short as possible — only include what is needed
 """
@@ -92,30 +93,12 @@ A sub-agent just completed a step. You must:
    - retry = true only for clearly transient failures (e.g. network timeout, unexpected exception)
 """
 
-BASE_SYSTEM_PROMPT = """You are an Orchestration Agent for automating financial workflows.
-
-## Role
-You coordinate sub-agents to fulfil a user's objective. You plan, delegate, inspect results, chain steps, and handle failures.
-
-## Sub-agents
-- **codegen_agent**: transforms Excel files into a fixed 4-sheet audit Excel + CSV
-- **sop_agent**: executes a business process following steps in an SOP document
-
-## Rules
-- Route from the objective alone — do not inspect files to decide routing
-- Never process files yourself
-- After execution completes, report the output file paths clearly to the user
-"""
-
-# ── State ─────────────────────────────────────────────────────────────────────
-
 
 class OrchestratorState(TypedDict):
 	messages: Annotated[list, add_messages]
 	user_objective: str  # mandatory input
 	files: list[str]  # mandatory input
-	system_prompt: str  # built at session start with memory context
-	plan: list[dict]  # [{"agent": str, "file": str, "instructions": str}]
+	plan: list[dict]  # [{"agent": str, "files": list[str], "instructions": str}]
 	current_step: int  # index into plan
 	step_results: list[dict]  # [{"step": int, "agent": str, "output": str}]
 	retries: int  # retry count for current step
@@ -192,7 +175,7 @@ async def planner_node(state: OrchestratorState) -> dict:
 	log.info("plan_created", steps=len(plan), reasoning=response.reasoning)
 
 	plan_summary = "\n".join(
-		f"  Step {i + 1}: {s['agent']} ← {s['file']}" for i, s in enumerate(plan)
+		f"  Step {i + 1}: {s['agent']} <- {', '.join(s['files'])}" for i, s in enumerate(plan)
 	)
 
 	return {
@@ -211,14 +194,22 @@ async def executor_node(state: OrchestratorState) -> dict:
 	step_idx = state["current_step"]
 	step = state["plan"][step_idx]
 	retries = state.get("retries", 0)
+	step_files = step.get("files", [])
 
 	log.info("executing_step", step=step_idx + 1, agent=step["agent"], attempt=retries + 1)
 
-	agent_input = {"file_path": step["file"], "instructions": step["instructions"]}
-
 	if step["agent"] == "codegen_agent":
-		output = await invoke_codegen_agent.ainvoke(agent_input)
+		if len(step_files) != 1:
+			output = (
+				"FAILURE: codegen_agent requires exactly one input file in the plan step. "
+				f"Received {len(step_files)} files."
+			)
+			log.error("invalid_codegen_step_files", files=step_files)
+		else:
+			agent_input = {"file_path": step_files[0], "instructions": step["instructions"]}
+			output = await invoke_codegen_agent.ainvoke(agent_input)
 	elif step["agent"] == "sop_agent":
+		agent_input = {"files": step_files, "instructions": step["instructions"]}
 		output = await invoke_sop_agent.ainvoke(agent_input)
 	else:
 		unknown = step["agent"]
@@ -354,32 +345,6 @@ async def evaluator_node(state: OrchestratorState) -> dict:
 	}
 
 
-async def chat_node(state: OrchestratorState) -> dict:
-	"""Handles follow-up questions after execution is complete."""
-	log = logger.bind(node="chat")
-	log.debug("follow_up_question")
-
-	context = f"Execution status: {state['status']}\n\nStep results:\n"
-	for r in state.get("step_results", []):
-		context += f"  Step {r['step'] + 1} ({r['agent']}): {r['output'][:300]}\n"
-
-	system = state.get("system_prompt", BASE_SYSTEM_PROMPT) + f"\n\n## Execution Summary\n{context}"
-	messages = [SystemMessage(content=system)] + list(state["messages"])
-
-	response = await _llm().ainvoke(messages)
-	return {"messages": [response]}
-
-
-# ── Routing (sync — no I/O, just state inspection) ────────────────────────────
-
-
-def route_entry(state: OrchestratorState) -> str:
-	"""First-run goes to planner; follow-up questions after completion go to chat."""
-	if state.get("status", "planning") == "planning":
-		return "planner"
-	return "chat"
-
-
 def route_after_evaluator(state: OrchestratorState) -> str:
 	if state["status"] in ("done", "failed"):
 		return END
@@ -389,41 +354,29 @@ def route_after_evaluator(state: OrchestratorState) -> str:
 # ── Graph ─────────────────────────────────────────────────────────────────────
 
 
-def build_agent():
+def build_agent(
+	*,
+	draw_graph_png: bool = True,
+	graph_png_path: str = "orchestrator_graph.png",
+):
 	builder = StateGraph(OrchestratorState)
 
 	builder.add_node("planner", planner_node)
 	builder.add_node("executor", executor_node)
 	builder.add_node("evaluator", evaluator_node)
-	builder.add_node("chat", chat_node)
 
-	builder.add_conditional_edges(START, route_entry, {"planner": "planner", "chat": "chat"})
+	builder.add_edge(START, "planner")
 	builder.add_edge("planner", "executor")
 	builder.add_edge("executor", "evaluator")
 	builder.add_conditional_edges(
 		"evaluator", route_after_evaluator, {"executor": "executor", END: END}
 	)
-	builder.add_edge("chat", END)
 
-	return builder.compile(checkpointer=MemorySaver())
-
-
-# ── Helpers ───────────────────────────────────────────────────────────────────
-
-
-def build_system_prompt(files: list[str]) -> str:
-	similar_runs = find_similar_runs(files)
-	if not similar_runs:
-		logger.debug("memory_lookup", files=files, matches=0)
-		return BASE_SYSTEM_PROMPT
-	logger.info("memory_lookup", files=files, matches=len(similar_runs))
-	history = format_runs_for_context(similar_runs)
-	return (
-		BASE_SYSTEM_PROMPT
-		+ "\n\n## Past runs for similar files\n"
-		+ history
-		+ "\n\nUse this history to confirm intent without re-asking."
-	)
+	agent = builder.compile(checkpointer=MemorySaver())
+	if draw_graph_png:
+		png_bytes = agent.get_graph().draw_mermaid_png()
+		Path(graph_png_path).write_bytes(png_bytes)
+	return agent
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
@@ -455,7 +408,6 @@ async def _run():
 	print("=" * 50)
 
 	agent = build_agent()
-	system_prompt = build_system_prompt(files)
 
 	# Kick off — planner → executor(s) → evaluator(s), all in one ainvoke
 	result = await agent.ainvoke(
@@ -463,7 +415,6 @@ async def _run():
 			"messages": [HumanMessage(content="Please start.")],
 			"user_objective": objective,
 			"files": files,
-			"system_prompt": system_prompt,
 			"plan": [],
 			"current_step": 0,
 			"step_results": [],

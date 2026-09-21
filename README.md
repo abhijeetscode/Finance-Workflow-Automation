@@ -1,8 +1,37 @@
-# Code Generation Agent for Finance Automation
+# Finance Workflow Automation
 
-An agentic system that learns business logic from a working example (input file + processing script + output file), then generates Python scripts to transform new input files into the expected output format.
+An agentic system for finance operations. An **Orchestrator** (LangGraph) reads a user objective plus a set of files, routes the work to the right specialist sub-agent, and evaluates the result — retrying or asking the user when needed. Two sub-agents currently exist:
+
+- **CodeGen Agent** — learns business logic from a working example (input file + processing script + output file), then generates and runs Python scripts to transform new Excel inputs into a fixed output format (e.g. vendor payment audits for Bill.com).
+- **SOP Agent** — parses a Standard Operating Procedure document (`.docx`) plus supporting data files and executes the steps it describes (e.g. a fixed asset rollforward).
 
 ## How It Works
+
+### Orchestrator
+
+```
+User objective + files
+         │
+         ▼
+┌───────────────────┐
+│ 1. Plan           │  LLM picks exactly one sub-agent (codegen_agent | sop_agent)
+│    (planner)      │  and assembles the files/instructions for that step
+├───────────────────┤
+│ 2. Execute        │  Invoke the chosen sub-agent
+│    (executor)     │
+├───────────────────┤
+│ 3. Evaluate       │  Classify SUCCESS/FAILURE from the sub-agent's output;
+│    (evaluator)    │  retry (up to 2x) on transient failures, else stop
+├───────────────────┤
+│ 4. Log run        │  Fingerprint input files (content shape, not filename)
+│    (memory)       │  and persist objective/agent/outcome to memory/
+├───────────────────┤
+│ 5. Follow-up chat │  After completion, keep the session open for
+│                   │  further user turns (checkpointed with thread_id)
+└───────────────────┘
+```
+
+### CodeGen Agent
 
 ```
 New Excel file
@@ -33,11 +62,15 @@ New Excel file
 └─────────────────┘
 ```
 
-The output format is fixed:
+The CodeGen Agent's output format is fixed:
 - **Excel audit file** with sheets: Vendor Payments, Raw Data, Payment Holds, Previously Uploaded
 - **CSV file** for Bill.com upload
 
 Input files can have different sheet names, column names, and structure. The agent adapts.
+
+### SOP Agent
+
+Given a `.docx` SOP and supporting files (trial balances, depreciation schedules, output templates, etc.), the agent locates the SOP document, extracts its numbered/bulleted steps, and reports an execution-ready plan referencing the supporting files it was given.
 
 ## Setup
 
@@ -54,15 +87,31 @@ cp .env.example .env
 
 ## Usage
 
-### Run the agent
+### Run the orchestrator
+
+```bash
+uv run orchestrator/run_orchestrator.py
+```
+
+`run_orchestrator.py` currently hardcodes which scenario to run (`"sop"` or `"vendor_payments"`, see `SCENARIOS` in the file) and feeds it to `orchestrator.agent.main` as if typed on the CLI. To run it directly with your own objective and files:
+
+```bash
+uv run python -m orchestrator.agent "transform vendor payments into standard audit format" "./inputs/[Simple] Bill processing_tampered_2.xlsx"
+```
+
+After the initial plan → execute → evaluate pass completes, the orchestrator drops into a follow-up chat loop (`quit`/`exit`/`q` to leave).
+
+### Run the CodeGen Agent directly
 
 ```bash
 # Default input file
-uv run code_gen_agent.py
+uv run codegen_agent/agent.py
 
 # Custom input file
-uv run code_gen_agent.py "./inputs/[Simple] Bill processing_tampered.xlsx"
+uv run codegen_agent/agent.py "./inputs/[Simple] Bill processing_tampered.xlsx"
 ```
+
+Top-level `code_gen_agent.py`, `code_gen_models.py`, and `code_gen_tools.py` are the original standalone versions of the same agent, kept at the repo root; `codegen_agent/` is the packaged version imported by the orchestrator (`from codegen_agent import CodeGenAgent`) and exposed via the `codegen-agent` script entry point.
 
 ### Schema Adapter Agent (Alternative Approach)
 
@@ -71,29 +120,55 @@ uv run code_gen_agent.py "./inputs/[Simple] Bill processing_tampered.xlsx"
 ## Project Structure
 
 ```
-├── code_gen_agent.py       # Code Gen Agent loop (Anthropic Messages API)
-├── code_gen_tools.py       # Code Gen tool implementations (DSPy + pandas)
-├── code_gen_models.py      # Pydantic models for data transfer
-├── schema_adapter_agent.py # Schema Adapter Agent (OpenAI, alternative approach)
-├── tool_funcs.py           # Schema Adapter tool implementations
+├── orchestrator/                # LangGraph orchestrator (routes to sub-agents)
+│   ├── agent.py                 # planner / executor / evaluator graph + CLI
+│   ├── run_orchestrator.py      # hardcoded scenario runner (dev convenience)
+│   ├── sop_agent.py             # SOP document parsing + step extraction
+│   ├── tools/
+│   │   ├── subagents.py         # tools: invoke_codegen_agent, invoke_sop_agent, log_run, ask_user
+│   │   ├── document.py          # .docx section listing/reading tools
+│   │   └── excel.py             # Excel sheet listing/reading tools
+│   └── memory/
+│       ├── store.py             # persist/query run history (orchestrator_runs.json)
+│       └── fingerprint.py       # content-based file fingerprinting (sheet/column shape, docx headings)
+├── codegen_agent/                # packaged CodeGen Agent (used by the orchestrator)
+│   ├── agent.py                  # agent loop (Anthropic Messages API)
+│   ├── tools.py                  # tool implementations (DSPy + pandas)
+│   └── models.py                 # Pydantic models for data transfer
+├── code_gen_agent.py             # original standalone CodeGen Agent loop
+├── code_gen_tools.py             # original standalone tool implementations
+├── code_gen_models.py            # original standalone Pydantic models
+├── schema_adapter_agent.py       # Schema Adapter Agent (OpenAI, alternative approach)
+├── tool_funcs.py                 # Schema Adapter tool implementations
 ├── code/
-│   └── process.py          # Reference processing script (ground truth)
-├── inputs/                 # Input Excel files (normal + tampered + error)
-├── outputs/                # Generated output files
-├── generated_scripts/      # LLM-generated transform scripts
-├── logs/                   # Structured logs (structlog)
-├── golden_schema.json      # Expected input schema (for Schema Adapter)
-├── business_logic_spec.json # Cached BusinessLogicSpec (for Code Gen Agent)
-└── deployment_architecture.excalidraw  # Architecture diagram
+│   └── process.py                # reference processing script (ground truth for CodeGen Agent)
+├── inputs/                       # input Excel files (normal + tampered + error) for CodeGen Agent
+├── outputs/                      # generated output files (audit xlsx + Bill.com csv)
+├── generated_scripts/            # LLM-generated transform scripts
+├── raw_data/                     # SOP Agent inputs (SOP docx, trial balance, fixed asset reports, etc.)
+├── sop_outputs/                  # SOP Agent output files
+├── logs/                         # structured logs (structlog) — orchestrator, codegen, schema adapter
+├── memory/                       # orchestrator run history (orchestrator_runs.json)
+├── business_logic_spec.json      # cached BusinessLogicSpec (for CodeGen Agent)
+├── orchestrator_graph.png        # rendered LangGraph graph for the orchestrator
+└── deployment_architecture.excalidraw  # architecture diagram
 ```
 
 ## Architecture
 
-### Agent Loop
+### Orchestrator
 
-`code_gen_agent.py` runs a tool-calling loop using the Anthropic Messages API. The LLM decides which tool to call next based on a system prompt that defines the workflow. Agent state (spec, mapping, script path) is tracked as Pydantic models and injected into tool calls.
+`orchestrator/agent.py` builds a LangGraph `StateGraph` with three nodes:
 
-### Tools
+- **planner** — structured-output LLM call that reads the objective and file list and produces exactly one `PlanStep` (`agent`, `files`, `instructions`). It does not chain multiple sub-agents in one plan.
+- **executor** — invokes the chosen sub-agent's tool (`invoke_codegen_agent` or `invoke_sop_agent`) with the planned files/instructions.
+- **evaluator** — structured-output LLM call that classifies the step as success/failure from the sub-agent's output prefix (`SUCCESS:` / `FAILURE:`) or content, decides whether to retry (up to `MAX_RETRIES = 2`, only for transient failures), and on completion logs the run to memory.
+
+State is checkpointed (`MemorySaver`, keyed by a session `thread_id`), so after the initial run finishes the CLI keeps the graph alive for follow-up turns.
+
+### CodeGen Agent
+
+`codegen_agent/agent.py` (and its standalone twin `code_gen_agent.py`) runs a tool-calling loop using the Anthropic Messages API. The LLM decides which tool to call next based on a system prompt that defines the workflow. Agent state (spec, mapping, script path) is tracked as Pydantic models and injected into tool calls.
 
 | Tool | Purpose |
 |------|---------|
@@ -107,13 +182,23 @@ uv run code_gen_agent.py "./inputs/[Simple] Bill processing_tampered.xlsx"
 | `ask_human` | Pause for human input (confirmation or additional context) |
 | `finish` / `terminate` | End the agent loop (success / failure) |
 
+### SOP Agent
+
+`orchestrator/sop_agent.py` is deterministic (no LLM call): it finds the `.docx` file among the given inputs, extracts paragraphs that look like numbered/lettered/bulleted steps (falling back to the first several substantial paragraphs if no clear step markers exist), and returns a structured preview referencing the supporting files. `orchestrator/tools/document.py` and `orchestrator/tools/excel.py` provide LangChain tools (section listing/reading, sheet listing/reading) available for a more LLM-driven SOP execution in the future.
+
+### Memory
+
+`orchestrator/memory/store.py` persists every orchestrator run (files, intent, agent used, outcome, timestamp) to `memory/orchestrator_runs.json`. Files are identified by a **content fingerprint** (`orchestrator/memory/fingerprint.py`) rather than filename — for `.xlsx` it hashes sorted sheet names + column headers, for `.docx` it hashes sorted heading text — so renamed-but-structurally-identical files still match. `find_similar_runs` can surface prior runs against similar files for future context injection.
+
 ### Key Design Decisions
 
-- **Output format is fixed, input varies** — the agent adapts to new input structures while always producing the same output schema
-- **Pydantic models for state** — no JSON serialization round-trips between tools
+- **Output format is fixed, input varies** — the CodeGen Agent adapts to new input structures while always producing the same output schema
+- **One sub-agent per objective** — the orchestrator's planner deliberately avoids chaining agents within a single plan, keeping routing decisions simple and auditable
+- **Pydantic models for state** — no JSON serialization round-trips between CodeGen Agent tools
 - **Confidence rubric** — deterministic scoring rules for sheet/column matching, not just LLM vibes
 - **fix_code gets the mapping** — when a generated script fails, the fixer sees the actual sheet/column names, not just semantic names
-- **Structured logging** — structlog writes to `logs/code_gen_agent.log` for observability
+- **Content fingerprinting over filenames** — orchestrator memory matches files by structural shape so renamed inputs still hit prior run history
+- **Structured logging** — structlog writes to `logs/orchestrator.log`, `logs/code_gen_agent.log`, and `logs/schema_adapter_agent.log` for observability
 
 ### Alerting
 
@@ -143,12 +228,12 @@ Metrics to monitor and when to fire alerts:
 
 | Metric | Source | WARN | CRIT | Why |
 |--------|--------|------|------|-----|
-| Success rate | `finish` vs `terminate` count | < 80% | < 60% | Agent failing too often, spec or prompts may need tuning |
-| Retry rate | `fix_code` calls / total jobs | > 30% | > 50% | Generated code quality degrading, check LLM model changes |
+| Success rate | `finish` vs `terminate` count (CodeGen Agent) / evaluator `status` (orchestrator) | < 80% | < 60% | Agent failing too often, spec or prompts may need tuning |
+| Retry rate | `fix_code` calls / total jobs, or orchestrator retries / total steps | > 30% | > 50% | Generated code quality degrading, check LLM model changes |
 | Latency p95 | `started_at` to `finished_at` | > 8min | > 12min | LLM slowdown, queue backlog, or script stuck in loop |
 | Human asks / job | `ask_human` calls per job | > 3 | > 5 | Confidence too low, mapping logic needs improvement |
-| Terminate rate | `terminate` / total jobs | > 25% | > 40% | Bad input files increasing, or agent too conservative |
-| Token spend | Sum of `input_tokens + output_tokens` | > $50/day | > $100/day | Runaway retries or prompt bloat |
+| Terminate rate | `terminate` / total jobs, or orchestrator `failed` status rate | > 25% | > 40% | Bad input files increasing, or agent too conservative |
+| Token spend | Sum of `input_tokens + output_tokens` across orchestrator + sub-agents | > $50/day | > $100/day | Runaway retries or prompt bloat |
 
 ### Deployment (Scaled)
 
